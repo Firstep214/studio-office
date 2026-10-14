@@ -983,6 +983,7 @@ const MTG_ROSTER = [
   ['12','Vex','Playtesting'],['13','Thorne','Playtesting'],['14','Sentinel','Performance'],
 ];
 const MTG_COL = { Management:'#f5c451', Strategy:'#9b6bff', Research:'#2ec4b6', Engineering:'#ff9f43', Verification:'#ff4d5e', Performance:'#36c5f0', Playtesting:'#5cc96b' };
+const MTG_AGENTS = [], PT_FIGS = [];
 const MTGX = RW / 2 + 8.5, MTGW = 16, MTGD = 14;
 {
   const fl = new THREE.Mesh(new THREE.PlaneGeometry(MTGW, MTGD), new THREE.MeshStandardMaterial({ map:floorTex, roughness:0.42, metalness:0.2, color:0xa8b4d8 }));
@@ -993,7 +994,7 @@ const MTGX = RW / 2 + 8.5, MTGW = 16, MTGD = 14;
   rug(MTGX, 0, MTGW - 1.2, MTGD - 1.4, 'MTG COMMANDER DIVISION · LIVE', '#7fe3ff', '#7fe3ff');
   const L = new THREE.PointLight(0x9fd8ff, 30, 22, 1.6); L.position.set(MTGX, 3.6, 0); scene.add(L);
   const sign = document.createElement('div');
-  sign.innerHTML = '<div style="font:700 15px Helvetica,Arial,sans-serif;color:#7fe3ff;background:rgba(5,12,24,.85);border:1px solid #7fe3ff;border-radius:8px;padding:5px 12px;text-align:center">MTG COMMANDER DIVISION<br><span style="font-size:11px;color:#5cff9a">● LIVE · 15 agents · separate from video studio</span></div>';
+  sign.innerHTML = '<div style="font:700 15px Helvetica,Arial,sans-serif;color:#7fe3ff;background:rgba(5,12,24,.85);border:1px solid #7fe3ff;border-radius:8px;padding:5px 12px;text-align:center">MTG COMMANDER DIVISION<br><span id="mtgSignSub" style="font-size:11px;color:#8b93a8">loading status/mtg.json…</span></div>';
   const so = new CSS2DObject(sign); so.position.set(MTGX, 3.4, -MTGD / 2 + 0.6); scene.add(so);
   const before = pickables.length;
   MTG_ROSTER.forEach(([n, name, dept], i) => {
@@ -1002,11 +1003,13 @@ const MTGX = RW / 2 + 8.5, MTGW = 16, MTGD = 14;
       skin:i % 6, hair:['#1b1726','#3a2a1e','#7a3b1e','#e9cf98','#24170f'][i % 5], style:['short','bun','long','bob','ponytail'][i % 5], acts:[] };
     const ws = buildWorkstation(a);
     ws.position.set(MTGX + (col - 2) * 2.6, 0, -4.2 + row * 3.8); ws.rotation.y = Math.PI; scene.add(ws);
+    a.key = name.toLowerCase(); a.baseRole = dept; MTG_AGENTS.push(a);
   });
   pickables.splice(before);   // MTG desks are display-only; they do not join the video-studio status loop
 }
 
 /* ===================== MTG PLAYTEST ROOM (connected to MTG room, front side) ===================== */
+const PT = { running:false, cards:null, ringMat:null };
 const PTZ = 11.5, PTD = 9;   // room spans z 7..16
 const PT_RESULT = "Engine test: 2 games run (Forge 2.0.15, 4-player Commander, AI pilots). Winners: A Adeline, D Veyran.<br><i>Engine-verification only \u2014 not deck strength. No win-rate stats yet.</i>";
 {
@@ -1039,7 +1042,7 @@ const PT_RESULT = "Engine test: 2 games run (Forge 2.0.15, 4-player Commander, A
   // seated players (face the table centre)
   const seatAt = (a, x, z) => {
     const s = new THREE.Group(); s.position.set(MTGX + x, 0, PTZ + z); s.rotation.y = Math.atan2(-x, -z); scene.add(s);
-    s.add(buildChair(new THREE.Color(a.color), false)); s.add(buildFigure(a).fig); return s;
+    s.add(buildChair(new THREE.Color(a.color), false)); const F = buildFigure(a); s.add(F.fig); PT_FIGS.push({ F, s, ry:null, ph:Math.random() * 10 }); return s;
   };
   const P = [['Kael','Aggro','#ff4d5e',0,2.0,0],['Nyx','Control','#4d7cff',2.0,0,1],['Vex','Combo','#c77dff',0,-2.0,2],['Thorne','Midrange/Politics','#5cc96b',-2.0,0,3]];
   for (const [n, r, c, x, z, i] of P) {
@@ -1059,9 +1062,15 @@ const PT_RESULT = "Engine test: 2 games run (Forge 2.0.15, 4-player Commander, A
   label('[MTG-09] Oracle', '#36c5f0', MTGX + ox, 1.85, PTZ + oz, 'Simulation Analyst · log terminal');
   // wall board: latest REAL Forge result
   const brd = document.createElement('div');
-  brd.innerHTML = `<div style="font:12px Helvetica,Arial,sans-serif;color:#d8ffe8;background:rgba(4,16,10,.9);border:1px solid #5cff9a;border-radius:8px;padding:7px 12px;max-width:300px;line-height:1.35"><b style="color:#5cff9a">FORGE ENGINE LOG (real)</b><br>${PT_RESULT}</div>`;
+  brd.innerHTML = `<div style="font:12px Helvetica,Arial,sans-serif;color:#d8ffe8;background:rgba(4,16,10,.9);border:1px solid #5cff9a;border-radius:8px;padding:7px 12px;max-width:300px;line-height:1.35"><b style="color:#5cff9a">FORGE PLAYTEST (real files only)</b><br><span id="ptBoard">${PT_RESULT}</span></div>`;
   const bo = new CSS2DObject(brd); bo.position.set(MTGX - 2.6, 2.4, PTZ - 3.3); scene.add(bo);
   mesh(box(2.4, 1.2, 0.05), M('#07140d', { r:0.6 }), MTGX - 2.6, 2.0, PTZ - 3.7, scene, false);
+  // live-batch props: spinning card stack in the table centre + glow ring
+  const cg = new THREE.Group(); cg.position.set(MTGX, 0.83, PTZ); scene.add(cg);
+  for (let i = 0; i < 4; i++) { const c = mesh(box(0.13, 0.004, 0.18), M(['#f5f0e0','#4d7cff','#8a6bb0','#ff6b3d'][i], { r:0.6 }), Math.cos(i * 1.57) * 0.22, i * 0.006, Math.sin(i * 1.57) * 0.22, cg); c.rotation.y = i * 0.4; }
+  const prm = new THREE.MeshBasicMaterial({ color:hdr('#5cff9a', 1.4), transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false });
+  const pr = new THREE.Mesh(new THREE.RingGeometry(1.5, 1.62, 64), prm); pr.rotation.x = -Math.PI / 2; pr.position.set(MTGX, 0.015, PTZ); scene.add(pr);
+  PT.cards = cg; PT.ringMat = prm;
 }
 
 /* ===================== SET DRESSING ===================== */
@@ -1262,6 +1271,7 @@ const STATES = {
   leads:    { label:'leads',    col:'#b47cff' },
   blocked:  { label:'blocked',  col:'#ff4d5e' },
   idle:     { label:'idle',     col:'#6b7389' },
+  done:     { label:'done',     col:'#f5c451' },
 };
 const svg = d => `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const ICONS = {
@@ -1270,6 +1280,7 @@ const ICONS = {
   leads:    svg('<circle cx="6.6" cy="6.6" r="4.4"/><path d="M9.9 9.9L14.3 14.3" stroke-width="2.1"/>'),
   blocked:  svg('<circle cx="8" cy="8" r="6.2"/><path d="M3.7 12.3l8.6-8.6"/>'),
   idle:     '',
+  done:     svg('<path d="M3 8.5l3.2 3.2L13 4.8"/>'),
 };
 const POLL_MS = 60000;
 const live = { mode:'live', ok:null, status:null, entries:null, at:null, err:'', feedSig:'' };
@@ -1388,6 +1399,66 @@ async function poll() {
     setLiveUI();
     if (first && live.mode === 'live') snapAll();
   } finally { polling = false; }
+}
+/* ===================== MTG LIVE (status/mtg.json built from real /workspace/mtg files) ===================== */
+function setMtgState(a, state, task, updated) {
+  if (!STATES[state]) state = 'idle';
+  const prev = a.state; a.state = state; a.task = task || ''; a.updated = updated || null;
+  a.busy = state === 'working'; if (state !== 'idle') a.gesture = null;
+  if (prev !== state && state !== 'idle') a.flash = 1;
+  const st = STATES[state], on = state !== 'idle';
+  a.tagEl.classList.toggle('busy', on); a.tagEl.style.setProperty('--c', st.col);
+  a.tagIc.innerHTML = on ? ICONS[state] : '';
+  a.actEl.textContent = (a.task || st.label) + (updated ? ` · ${ago(updated)}` : '');
+  a.tagEl.querySelector('.r').textContent = `${a.baseRole} · ${st.label}`;
+}
+async function pollMtg() {
+  let j = null;
+  try { j = await getUrl('status/mtg.json'); } catch { j = null; }
+  const sub = document.getElementById('mtgSignSub'), brd = document.getElementById('ptBoard');
+  if (!j || !j.agents) {
+    MTG_AGENTS.forEach(a => setMtgState(a, 'idle', 'No MTG status published', null));
+    if (sub) { sub.textContent = '● status unavailable'; sub.style.color = '#ff4d5e'; }
+    PT.running = false; return;
+  }
+  const c = {};
+  for (const a of MTG_AGENTS) {
+    const e = j.agents[a.key];
+    if (e) setMtgState(a, String(e.state || 'idle').toLowerCase(), e.task, e.updated); else setMtgState(a, 'idle', 'No status reported', null);
+    c[a.state] = (c[a.state] || 0) + 1;
+  }
+  if (sub) { sub.textContent = `● LIVE · ${c.working || 0} working · ${c.done || 0} done · ${c.idle || 0} idle · updated ${ago(j.generated)}`; sub.style.color = '#5cff9a'; }
+  const p = j.playtest || {}; PT.running = !!p.running;
+  if (brd) {
+    let h = p.running ? `<b style="color:#ffd77a">● BATCH 1 RUNNING</b> · ${p.games_finished}/${p.games_logged} games finished` :
+      p.games_finished ? `Batch 1 stopped · ${p.games_finished} games finished` : 'No playtest batch running';
+    if (p.last_game) h += `<br>Last finished game: ${p.last_game.winner ? esc(p.last_game.winner) + ' won' : 'no winner (draw/timeout)'}${p.last_game.seconds ? ' · ' + p.last_game.seconds + 's sim' : ''} · ${ago(p.last_game.at)}`;
+    if (p.report && p.report.lines && p.report.lines.length) h += `<br><b style="color:#5cff9a">PLAYTEST_BATCH1.md</b> (${ago(p.report.updated)})<br>` + p.report.lines.map(esc).join('<br>');
+    else h += '<br><i>Win rates appear only once PLAYTEST_BATCH1.md is written.</i>';
+    brd.innerHTML = h;
+  }
+}
+function animateMtg(dt, t) {
+  for (const a of MTG_AGENTS) {
+    animateAgent(a, dt, t);
+    if (a.state === 'done') {           // relaxed, satisfied lean + gentle sway
+      a.F.body.position.y += Math.sin((t + a.phase) * 1.4) * 0.012;
+      a.ringMat.color.set(hdr('#f5c451', 1.4)); a.ringMat.opacity = 0.35 + Math.sin((t + a.phase) * 2) * 0.1;
+    }
+    a.F.fig.position.y = Math.sin((t + a.phase) * 1.1) * 0.015;   // idle breathing bob for every avatar
+  }
+  const on = PT.running ? 1 : 0;
+  for (const f of PT_FIGS) {
+    const T = t + f.ph, F = f.F;
+    F.fig.position.y = Math.sin(T * 1.3) * 0.015;
+    F.head.rotation.y = Math.sin(T * 0.5) * (0.25 + on * 0.25);
+    F.head.rotation.x = 0.1 + on * (0.25 + Math.sin(T * 2.1) * 0.05);
+    F.body.rotation.x = on * (0.12 + Math.sin(T * 1.7) * 0.03);
+    if (f.ry === null) f.ry = f.s.rotation.y; f.s.rotation.y = f.ry + Math.sin(T * 0.4) * 0.08;
+    for (const arm of F.arms) { arm.sh.rotation.x = -0.35 - on * (0.35 + Math.max(0, Math.sin(T * 2.5 + arm.s)) * 0.5); arm.el.rotation.x = -1.0 - on * 0.2; }
+  }
+  if (PT.cards) { PT.cards.rotation.y += dt * (0.15 + on * 1.4); PT.cards.position.y = 0.83 + on * (0.03 + Math.sin(t * 3) * 0.02); }
+  if (PT.ringMat) PT.ringMat.opacity = on * (0.35 + Math.sin(t * 3) * 0.2);
 }
 
 /* ===================== DEMO SIMULATION (optional, off by default) ===================== */
@@ -1628,6 +1699,7 @@ function tick() {
   updateSim(dt);
   updateOrbs(dt);
   for (const a of AGENTS) animateAgent(a, dt, t);
+  animateMtg(dt, t);
   const nBusy = AGENTS.filter(a => a.busy).length;
   holo.userData.spin.rotation.y += dt * 0.5;
   holo.userData.reel.rotation.z += dt * (0.6 + nBusy * 0.12);
@@ -1657,7 +1729,8 @@ setLiveUI();
 feed('Connecting to live status…', '#8b93a8');
 $('clock').textContent = timeStr(); setInterval(() => { $('clock').textContent = timeStr(); }, 1000);
 renderer.setAnimationLoop(tick);
-poll(); setInterval(poll, POLL_MS);                 // LIVE by default
+poll(); setInterval(poll, POLL_MS);
+pollMtg(); setInterval(pollMtg, 30000);                 // LIVE by default
 if (params.has('busy')) startSim();                // optional demo via ?busy
 if (params.has('focus') && byId[params.get('focus')]) { const fa = byId[params.get('focus')]; setTimeout(() => focusAgent(fa), 300); }
 window.__office3d = { scene, camera, controls, AGENTS, live, poll, startSim, stopDemo, focusAgent };
