@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-14T20:11:20+00:00",
+ "generated": "2026-10-14T20:24:39+00:00",
  "agents": {
   "arbiter": {
    "state": "done",
@@ -19,7 +19,7 @@
   "forge": {
    "state": "done",
    "task": "Built 4 V1 decks (Bracket 2) + Forge .dck files",
-   "updated": "2026-10-14T09:48:06+00:00"
+   "updated": "2026-10-14T20:12:38+00:00"
   },
   "sentinel": {
    "state": "working",
