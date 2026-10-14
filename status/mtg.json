@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-14T11:20:26+00:00",
+ "generated": "2026-10-14T11:23:39+00:00",
  "agents": {
   "arbiter": {
    "state": "done",
@@ -23,32 +23,32 @@
   },
   "sentinel": {
    "state": "working",
-   "task": "Forge batch 1 running: 23/24 games finished",
+   "task": "Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "oracle": {
    "state": "working",
-   "task": "Forge batch 1 running: 23/24 games finished",
+   "task": "Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "kael": {
    "state": "working",
-   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 23/24 games finished",
+   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "nyx": {
    "state": "working",
-   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 23/24 games finished",
+   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "vex": {
    "state": "working",
-   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 23/24 games finished",
+   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "thorne": {
    "state": "working",
-   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 23/24 games finished",
+   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "magnus": {
@@ -80,15 +80,30 @@
  "playtest": {
   "running": true,
   "games_logged": 24,
-  "games_finished": 23,
+  "games_finished": 24,
   "last_game": {
-   "winner": "D",
+   "winner": "C",
    "draw": false,
-   "seconds": 48,
-   "at": "2026-10-14T11:19:59+00:00"
+   "seconds": 192,
+   "at": "2026-10-14T11:20:47+00:00"
   },
-  "report": null,
-  "updated": "2026-10-14T11:19:59+00:00"
+  "report": {
+   "file": "PLAYTEST_BATCH1.md",
+   "updated": "2026-10-14T11:21:50+00:00",
+   "lines": [
+    "Engine: Forge 2.0.15 (SNAPSHOT-09.28), headless `sim -d  -f Commander -n 1 -c 300`, Java 21, AI vs AI. One game per JVM; 4 seat rotations run in parallel, 6 gam",
+    "Decks: A11 = Deck A V1.1 (Wrath of God -> Inspired Charge), B V1, C V1, D V1. Seat 1 = listed first (goes first).",
+    "## Results (24/24 games finished; 0 draws; 0 timeouts; 0 crashes)",
+    "| Deck | Wins | Win % |",
+    "Turn count = Forge's global turn counter (all players' turns summed). Mean 26.0 (≈6.5 rounds), min 19, max 43.",
+    "## Per game",
+    "| Log | Seat order | Winner | Turns | Wall time | Exit | AI-decision TimeoutExceptions |",
+    "- No crashes, draws or game timeouts. rot1_g1 (2) and rot1_g3 (4) logged `java.util.concurrent.TimeoutException` in AiController.chooseSpellAbilityToPlayFromLis",
+    "- Wins by seat: seat 1 = 7, seat 2 = 7, seat 3 = 7, seat 4 = 3 (last seat disadvantaged). A11 won from seats 1/2/3 (4/3/3) but 0/6 from seat 4 (rot2). A11's win",
+    "- Caveats: Forge AI pilots, not humans; control (B) and combo-ish engines (D) are typically under-played by the AI. 24 games is a small sample (±~10pp). Not a p"
+   ]
+  },
+  "updated": "2026-10-14T11:20:47+00:00"
  },
  "decks": {
   "A": {
