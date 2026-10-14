@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-14T11:28:33+00:00",
+ "generated": "2026-10-14T11:35:38+00:00",
  "agents": {
   "arbiter": {
    "state": "done",
@@ -89,7 +89,7 @@
   },
   "report": {
    "file": "PLAYTEST_BATCH1.md",
-   "updated": "2026-10-14T11:21:50+00:00",
+   "updated": "2026-10-14T11:28:39+00:00",
    "lines": [
     "## Results (24/24 games finished; 0 draws; 0 timeouts; 0 crashes)",
     "| Deck | Wins | Win % |",
