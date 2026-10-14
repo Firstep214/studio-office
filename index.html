@@ -157,6 +157,7 @@
   <div class="btns small">
     <button id="btnView">Overview</button>
     <button id="btnMtg">MTG room</button>
+    <button id="btnPlay">Playtest</button>
     <button id="btnOrbit">Auto-orbit</button>
     <button id="btnLabels">Labels: full</button>
   </div>
@@ -1005,6 +1006,64 @@ const MTGX = RW / 2 + 8.5, MTGW = 16, MTGD = 14;
   pickables.splice(before);   // MTG desks are display-only; they do not join the video-studio status loop
 }
 
+/* ===================== MTG PLAYTEST ROOM (connected to MTG room, front side) ===================== */
+const PTZ = 11.5, PTD = 9;   // room spans z 7..16
+const PT_RESULT = "Engine test: 2 games run (Forge 2.0.15, 4-player Commander, AI pilots). Winners: A Adeline, D Veyran.<br><i>Engine-verification only \u2014 not deck strength. No win-rate stats yet.</i>";
+{
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(MTGW, PTD), new THREE.MeshStandardMaterial({ map:floorTex, roughness:0.42, metalness:0.2, color:0x9fb0c8 }));
+  fl.rotation.x = -Math.PI / 2; fl.position.set(MTGX, 0.002, PTZ); fl.receiveShadow = true; scene.add(fl);
+  makeWall(MTGW, MTGX, PTZ + PTD / 2, Math.PI, new THREE.Vector3(0, 0, -1));
+  makeWall(PTD, MTGX + MTGW / 2, PTZ, -Math.PI / 2, new THREE.Vector3(-1, 0, 0));
+  makeWall(PTD, MTGX - MTGW / 2, PTZ, Math.PI / 2, new THREE.Vector3(1, 0, 0));
+  rug(MTGX, PTZ, 9, 7.6, 'PLAYTEST ROOM', '#5cff9a', '#5cff9a');
+  const L = new THREE.PointLight(0xbfffd8, 28, 16, 1.6); L.position.set(MTGX, 3.5, PTZ); scene.add(L);
+  // square game table
+  const T = new THREE.Group(); T.position.set(MTGX, 0, PTZ); scene.add(T);
+  mesh(rbox(2.6, 0.08, 2.6, 0.04), M('#1a140c', { r:0.4, m:0.2 }), 0, 0.76, 0, T);
+  mesh(box(2.45, 0.01, 2.45), M('#0f3b2a', { r:0.95 }), 0, 0.805, 0, T, false);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) mesh(box(0.08, 0.76, 0.08), darkMetal, sx * 1.15, 0.38, sz * 1.15, T);
+  const label = (txt, color, x, y, z, sub) => {
+    const d = document.createElement('div');
+    d.innerHTML = `<div class="tag" style="--c:${color}"><div class="n"><span class="dot"></span>${txt}</div>${sub ? `<div class="r">${sub}</div>` : ''}</div>`;
+    const o = new CSS2DObject(d); o.position.set(x, y, z); scene.add(o); return o;
+  };
+  // play mats + deck boxes
+  const DECKS = [['A','Adeline','#f5f0e0',0,0.75],['B','Brago','#4d7cff',0.75,0],['C','Teysa','#8a6bb0',0,-0.75],['D','Veyran','#ff6b3d',-0.75,0]];
+  for (const [k, n, c, x, z] of DECKS) {
+    const mat = canvasTex(256, 160, (g, w, h) => { g.fillStyle = '#0b1a14'; g.fillRect(0, 0, w, h); g.strokeStyle = c; g.lineWidth = 6; g.strokeRect(6, 6, w - 12, h - 12);
+      g.fillStyle = c; g.font = 'bold 40px Helvetica,Arial'; g.textAlign = 'center'; g.fillText(k + ' · ' + n, w / 2, h / 2 + 14); });
+    const pm = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.5), new THREE.MeshStandardMaterial({ map:mat, roughness:0.9 }));
+    pm.rotation.x = -Math.PI / 2; pm.rotation.z = Math.atan2(x, z); pm.position.set(MTGX + x, 0.812, PTZ + z); scene.add(pm);
+    mesh(rbox(0.12, 0.14, 0.09, 0.01), M(c, { r:0.5 }), MTGX + x * 0.55, 0.88, PTZ + z * 0.55, scene);
+  }
+  // seated players (face the table centre)
+  const seatAt = (a, x, z) => {
+    const s = new THREE.Group(); s.position.set(MTGX + x, 0, PTZ + z); s.rotation.y = Math.atan2(-x, -z); scene.add(s);
+    s.add(buildChair(new THREE.Color(a.color), false)); s.add(buildFigure(a).fig); return s;
+  };
+  const P = [['Kael','Aggro','#ff4d5e',0,2.0,0],['Nyx','Control','#4d7cff',2.0,0,1],['Vex','Combo','#c77dff',0,-2.0,2],['Thorne','Midrange/Politics','#5cc96b',-2.0,0,3]];
+  for (const [n, r, c, x, z, i] of P) {
+    seatAt({ color:c, skin:i + 1, hair:['#1b1726','#e9cf98','#7a3b1e','#3a2a1e'][i], style:['short','long','bob','short'][i] }, x, z);
+    label(`[MTG-${10 + i}] ${n}`, c, MTGX + x, 1.75, PTZ + z, r);
+  }
+  // Sentinel at the head (far side), Oracle at a side log terminal
+  seatAt({ color:'#36c5f0', skin:4, hair:'#24170f', style:'short' }, 2.4, -2.4);
+  label('[MTG-14] Sentinel', '#36c5f0', MTGX + 2.4, 1.85, PTZ - 2.4, 'Testing Director');
+  const ox = 4.2, oz = 1.6;
+  { const g = new THREE.Group(); g.position.set(MTGX + ox, 0, PTZ + oz - 0.7); scene.add(g);
+    mesh(rbox(1.2, 0.05, 0.6, 0.02), M('#161c2c', { r:0.5, m:0.3 }), 0, 0.75, 0, g); mesh(box(0.06, 0.75, 0.5), darkMetal, 0, 0.37, 0, g);
+    mesh(rbox(0.7, 0.42, 0.04, 0.01), blackPlastic, 0, 1.0, -0.15, g);
+    const sc = new THREE.Mesh(new THREE.PlaneGeometry(0.65, 0.37), new THREE.MeshBasicMaterial({ map:codeTex.clone(), color:new THREE.Color('#36c5f0').multiplyScalar(0.3) }));
+    sc.position.set(0, 1.0, -0.128); g.add(sc); }
+  seatAt({ color:'#36c5f0', skin:2, hair:'#5a3a22', style:'bun' }, ox, oz + 0.15).rotation.y = Math.PI;
+  label('[MTG-09] Oracle', '#36c5f0', MTGX + ox, 1.85, PTZ + oz, 'Simulation Analyst · log terminal');
+  // wall board: latest REAL Forge result
+  const brd = document.createElement('div');
+  brd.innerHTML = `<div style="font:12px Helvetica,Arial,sans-serif;color:#d8ffe8;background:rgba(4,16,10,.9);border:1px solid #5cff9a;border-radius:8px;padding:7px 12px;max-width:300px;line-height:1.35"><b style="color:#5cff9a">FORGE ENGINE LOG (real)</b><br>${PT_RESULT}</div>`;
+  const bo = new CSS2DObject(brd); bo.position.set(MTGX - 2.6, 2.4, PTZ - 3.3); scene.add(bo);
+  mesh(box(2.4, 1.2, 0.05), M('#07140d', { r:0.6 }), MTGX - 2.6, 2.0, PTZ - 3.7, scene, false);
+}
+
 /* ===================== SET DRESSING ===================== */
 // holo story table (center of the floor)
 const holo = new THREE.Group(); holo.position.set(0, 0, -0.75); scene.add(holo);
@@ -1543,6 +1602,8 @@ $('btnSim').onclick = () => (live.mode === 'demo' ? stopDemo() : startSim());
 $('btnReset').onclick = () => (live.mode === 'demo' ? stopDemo() : poll());
 $('btnView').onclick = () => flyTo(HOME.pos, HOME.target, 1.4);
 $('btnMtg').onclick = () => flyTo(new THREE.Vector3(RW / 2 + 8.5, 13, 13), new THREE.Vector3(RW / 2 + 8.5, 0, -0.5), 1.4);
+$('btnPlay').onclick = () => flyTo(new THREE.Vector3(RW / 2 + 8.5, 11, 22.5), new THREE.Vector3(RW / 2 + 8.5, 0.6, 11.2), 1.4);
+if (params.has('playtest')) setTimeout(() => flyTo(new THREE.Vector3(RW / 2 + 8.5, 11, 22.5), new THREE.Vector3(RW / 2 + 8.5, 0.6, 11.2), 0.1), 300);
 if (params.has('mtg')) setTimeout(() => flyTo(new THREE.Vector3(RW / 2 + 8.5, 13, 13), new THREE.Vector3(RW / 2 + 8.5, 0, -0.5), 0.1), 300);
 $('btnOrbit').onclick = () => { controls.autoRotate = !controls.autoRotate; $('btnOrbit').classList.toggle('toggled', controls.autoRotate); };
 const LBL = ['full', 'name', 'off']; let lblIdx = 0;
@@ -1575,7 +1636,7 @@ function tick() {
   updateTween(Math.min(rawDt, 0.25));
   controls.update();
   controls.target.x = clamp(controls.target.x, -RW / 2 + 0.5, RW / 2 + 16);
-  controls.target.z = clamp(controls.target.z, -RD / 2 + 0.5, RD / 2 - 0.5);
+  controls.target.z = clamp(controls.target.z, -RD / 2 + 0.5, 15.5);
   controls.target.y = clamp(controls.target.y, 0, RH - 0.5);
 
   // dollhouse cut-away: hide any wall standing between the camera and the room
