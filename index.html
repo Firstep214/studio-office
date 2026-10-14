@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual Office 3D · Voltaire AI Content Studio</title>
+<style>
+  :root{
+    --gold:#f5c451; --gold2:#ffe08a; --ink:#e9ecf5; --mut:#8b93a8;
+    --panel:rgba(9,13,24,.74); --line:rgba(245,196,81,.20);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#04060b;color:var(--ink);overflow:hidden;
+    font:13px/1.35 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  #app{position:fixed;inset:0}
+  #app canvas{display:block;outline:none;touch-action:none}
+  #app canvas.hovering{cursor:pointer}
+  .labels{position:absolute!important;inset:0;pointer-events:none}
+  .panel{position:fixed;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 12px 40px rgba(0,0,0,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #hud{top:16px;left:16px;width:292px;padding:14px 16px 14px}
+  .brand{display:flex;gap:10px;align-items:center}
+  .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#1a1304;font-weight:900;
+    background:linear-gradient(135deg,#ffe08a,#c99a2e);box-shadow:0 0 18px rgba(245,196,81,.35)}
+  h1{margin:0;font-size:16px;letter-spacing:.02em}
+  h1 em{font-style:normal;color:var(--gold)}
+  .brand p{margin:1px 0 0;color:var(--mut);font-size:11.5px;letter-spacing:.04em}
+  .count{display:flex;align-items:baseline;gap:6px;margin:12px 0 10px;padding:8px 10px;border-radius:10px;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+  .count b{font-size:28px;line-height:1;color:var(--gold2);font-variant-numeric:tabular-nums}
+  .count span{color:var(--mut)}
+  .count label{margin-left:auto;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
+  .btns{display:flex;gap:8px;margin-top:8px}
+  button{flex:1;cursor:pointer;border-radius:9px;padding:8px 10px;font:600 12.5px/1 inherit;color:var(--ink);
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);transition:.15s}
+  button:hover{background:rgba(255,255,255,.1);border-color:rgba(245,196,81,.45)}
+  button.primary{background:linear-gradient(180deg,#f7cf6a,#d9a63a);color:#1b1404;border-color:#f5c451}
+  button.primary:hover{filter:brightness(1.08)}
+  button.primary.on{box-shadow:0 0 0 2px rgba(245,196,81,.25),0 0 22px rgba(245,196,81,.45)}
+  .btns.small button{font-size:11.5px;padding:7px 6px;font-weight:500}
+  button.toggled{border-color:rgba(245,196,81,.6);color:var(--gold2)}
+  #roster{top:16px;right:16px;width:270px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}
+  .ph{padding:10px 14px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);
+    border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;cursor:default}
+  .ph span{color:var(--mut);letter-spacing:.04em;text-transform:none}
+  #list{list-style:none;margin:0;padding:6px;overflow:auto}
+  #list li{display:flex;gap:9px;align-items:center;padding:6px 8px;border-radius:9px;cursor:pointer;transition:.12s}
+  #list li:hover,#list li.hot{background:rgba(255,255,255,.06)}
+  .sw{width:10px;height:10px;border-radius:3px;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+  .li-main{min-width:0;flex:1}
+  .li-main b{font-weight:650}
+  .li-main i{font-style:normal;color:var(--mut);font-size:11.5px}
+  .li-main small{display:block;color:#6f778c;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #list li.busy .li-main small{color:#cfd6e6}
+  .st{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:20px;
+    color:#7d859a;border:1px solid rgba(255,255,255,.1);flex:none}
+  #list li.busy .st{color:#121212;background:var(--c);border-color:transparent}
+  #feed{left:16px;bottom:44px;width:340px;max-height:210px;overflow:hidden}
+  #feedList{list-style:none;margin:0;padding:6px 12px 10px;font-size:12px}
+  #feedList li{padding:3px 0;color:#c6cddd;display:flex;gap:8px;animation:fin .4s ease}
+  #feedList li time{color:#69718a;font-variant-numeric:tabular-nums;flex:none}
+  #feedList li .d{width:6px;height:6px;border-radius:50%;margin-top:6px;flex:none}
+  @keyframes fin{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+  #hint{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);color:#7c849a;font-size:11.5px;
+    letter-spacing:.03em;pointer-events:none;text-shadow:0 1px 6px #000;white-space:nowrap}
+  .tagwrap{pointer-events:none}
+  .tag{display:flex;flex-direction:column;align-items:center;padding:3px 8px 4px;border-radius:9px;white-space:nowrap;
+    background:rgba(5,8,16,.78);border:1px solid rgba(255,255,255,.09);font-size:11px;line-height:1.2;
+    transition:border-color .25s, box-shadow .25s, transform .2s;transform-origin:50% 100%}
+  .tag .n{font-weight:700;display:flex;align-items:center;gap:5px;color:#f1f3f9}
+  .tag .dot{width:7px;height:7px;border-radius:50%;background:#4e566b;transition:.25s}
+  .tag .r{font-size:9px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase}
+  .tag .a{display:none;font-size:10.5px;color:#f4e6bf;margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+  .tag.busy{border-color:var(--c);box-shadow:0 0 14px -4px var(--c)}
+  .tag.busy .dot{background:var(--c);box-shadow:0 0 8px var(--c)}
+  .tag.hot{transform:scale(1.12);border-color:var(--gold)}
+  .tag.hot .a{display:block}
+  .tag.mgr .n{color:var(--gold2)}
+  body.lbl-name .tag .r{display:none}
+  body.lbl-off .tag{display:none}
+  body.lbl-off .tag.hot{display:flex}
+  #tip{position:fixed;pointer-events:none;z-index:20;min-width:190px;max-width:260px;padding:10px 12px;border-radius:12px;
+    background:rgba(8,11,20,.92);border:1px solid rgba(245,196,81,.35);box-shadow:0 10px 30px rgba(0,0,0,.5);
+    opacity:0;transform:translateY(4px);transition:opacity .15s, transform .15s}
+  #tip.show{opacity:1;transform:none}
+  #tip .t1{font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px}
+  #tip .t2{color:var(--mut);font-size:11.5px;margin-top:1px}
+  #tip .t3{margin-top:7px;font-size:12px;color:#dfe4ef}
+  #tip .pill{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:20px;margin-left:auto;
+    border:1px solid rgba(255,255,255,.15);color:#8b93a8}
+  #tip .pill.busy{background:var(--c);color:#111;border-color:transparent}
+  #loading,#err{position:fixed;inset:0;display:grid;place-items:center;z-index:50;pointer-events:none;
+    color:var(--gold2);letter-spacing:.2em;text-transform:uppercase;font-size:12px;background:#04060b;transition:opacity .6s}
+  #loading.done{opacity:0}
+  #err{display:none;pointer-events:auto;text-transform:none;letter-spacing:0;font-size:14px;color:#e9ecf5;padding:30px}
+  #err div{max-width:560px;line-height:1.55;background:#0b1020;border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+  #err code{background:#111a30;padding:2px 6px;border-radius:6px;color:var(--gold2)}
+  /* live status */
+  .live{display:flex;align-items:center;gap:8px;margin-top:10px;padding:7px 10px;border-radius:9px;font-size:11.5px;line-height:1.3;
+    background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);color:var(--mut)}
+  .live .pd{width:8px;height:8px;border-radius:50%;flex:none;background:#59607a}
+  .live b{letter-spacing:.14em;font-size:11px;color:var(--ink)}
+  .live.ok{border-color:rgba(61,220,132,.35)}
+  .live.ok .pd{background:#3ddc84;box-shadow:0 0 8px #3ddc84;animation:lp 1.8s ease-in-out infinite}
+  .live.ok b{color:#5ff0a0}
+  .live.demo{border-color:rgba(255,181,71,.45)}
+  .live.demo .pd{background:#ffb547;box-shadow:0 0 8px #ffb547}
+  .live.demo b{color:#ffc56b}
+  .live.off{border-color:rgba(255,77,94,.5);background:rgba(255,77,94,.08);color:#ffb3ba}
+  .live.off .pd{background:#ff4d5e}
+  .live.off b{color:#ff8a95}
+  @keyframes lp{50%{opacity:.35}}
+  #offline{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:30;display:none;padding:9px 16px;border-radius:10px;
+    background:rgba(60,10,18,.92);border:1px solid rgba(255,77,94,.6);color:#ffd5da;font-size:12.5px;box-shadow:0 8px 30px rgba(0,0,0,.5);
+    max-width:min(560px,calc(100vw - 640px));text-align:center}
+  #offline code{background:rgba(0,0,0,.35);padding:1px 6px;border-radius:5px;color:#ffe08a}
+  body.is-off #offline{display:block}
+  .st svg,.tag .ic svg,#tip .pill svg,#feedList svg{width:11px;height:11px;vertical-align:-2px;margin-right:3px}
+  .tag .ic{display:none;color:var(--c)}
+  .tag.busy .ic{display:inline-flex}
+  #list li.st-blocked .li-main small{color:#ff9aa4}
+  #feedList li span b{font-weight:650}
+  #feedList li .s{font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+  @media (max-width:900px){
+    #roster{width:220px;max-height:46vh}
+    #feed{display:none}
+    #hud{width:250px}
+  }
+</style>
+
+<!-- Three.js r160 (ES modules) from jsDelivr via an import map.
+     The inline module below only imports https CDN URLs, so it also runs when the file is opened via file://
+     in current Chrome / Edge / Firefox / Safari. Internet access is required. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<div id="app"></div>
+
+<header id="hud" class="panel">
+  <div class="brand">
+    <div class="logo">V</div>
+    <div><h1>Virtual Office <em>3D</em></h1><p>VOLTAIRE · AI CONTENT STUDIO</p></div>
+  </div>
+  <div class="count"><b id="workN">0</b><span>/ 16</span><label>agents active</label></div>
+  <div id="live" class="live"><span class="pd"></span><span id="liveTxt"><b>CONNECTING</b> · reading status/status.json…</span></div>
+  <div class="btns">
+    <button id="btnSim">Simulate busy</button>
+    <button id="btnReset" title="Re-read status.json now">Refresh</button>
+  </div>
+  <div class="btns small">
+    <button id="btnView">Overview</button>
+    <button id="btnOrbit">Auto-orbit</button>
+    <button id="btnLabels">Labels: full</button>
+  </div>
+</header>
+
+<aside id="roster" class="panel">
+  <div class="ph">Roster <span id="rosterCount">0 working</span></div>
+  <ul id="list"></ul>
+</aside>
+
+<div id="feed" class="panel">
+  <div class="ph">Studio activity <span id="clock"></span></div>
+  <ul id="feedList"></ul>
+</div>
+
+<div id="hint">Drag to orbit · Scroll to zoom · Right-drag to pan · Click an agent (or roster row) to focus</div>
+<div id="tip"></div>
+<div id="offline"></div>
+<div id="loading">Loading 3D studio…</div>
+<div id="err"><div id="errMsg"></div></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+window.__office3dLoaded = true;
+const params = new URLSearchParams(location.search);
+const USE_BLOOM = !params.has('nobloom');
+
+/* ===================== ROSTER ===================== */
+const AGENTS = [
+  { id:'grok',  name:'Grok Bot', role:'Studio Manager', color:'#f5c451', robot:true,
+    acts:['Dispatching today’s briefs','Reviewing pipeline status','Approving the shot list','Syncing with Voltaire','Assigning specialists'] },
+  { id:'reed',  name:'Reed',  role:'Research',   color:'#2ec4b6', skin:0, hair:'#3a2a1e', style:'short', acc:['glasses'],
+    acts:['Scanning trend reports','Fact-checking sources','Compiling research pack','Pulling reference links'] },
+  { id:'iris',  name:'Iris',  role:'Ideas',      color:'#e8559a', skin:2, hair:'#1b1726', style:'bun',
+    acts:['Brainstorming hooks','Pitching 5 concepts','Riffing on loglines','Sketching a moodboard'] },
+  { id:'ivy',   name:'Ivy',   role:'Script',     color:'#5cc96b', skin:1, hair:'#7a3b1e', style:'ponytail',
+    acts:['Drafting scene 3','Polishing dialogue','Formatting the screenplay','Prepping script lock'] },
+  { id:'nova',  name:'Nova',  role:'Story',      color:'#9b6bff', skin:3, hair:'#e9cf98', style:'long',
+    acts:['Mapping story beats','Building character arcs','Tightening act two','Writing story direction'] },
+  { id:'atlas', name:'Atlas', role:'Canon',      color:'#c98a4b', skin:4, hair:'#24170f', style:'bald', acc:['beard'],
+    acts:['Updating the lore bible','Checking canon conflicts','Indexing world rules'] },
+  { id:'vera',  name:'Vera',  role:'Continuity', color:'#ff7a6b', skin:5, hair:'#a8322a', style:'bob',
+    acts:['Visual Gate: checking stills','Flagging wardrobe drift','Cross-checking period details','Verifying locked refs'] },
+  { id:'lens',  name:'Lens',  role:'Shots',      color:'#36c5f0', skin:1, hair:'#1e1e22', style:'short', acc:['capBack'],
+    acts:['Planning camera angles','Writing the shot list','Blocking scene 4'] },
+  { id:'pix',   name:'Pix',   role:'Prompts',    color:'#c77dff', skin:0, hair:'#ff9ad5', style:'bob', acc:['catEars'],
+    acts:['Crafting image prompts','Tuning style seeds','Batching prompt variants'] },
+  { id:'frame', name:'Frame', role:'Storyboard', color:'#ff9f43', skin:2, hair:'#2a1b12', style:'short', acc:['beret'],
+    acts:['Sketching storyboard panels','Sequencing frames','Annotating transitions'] },
+  { id:'reel',  name:'Reel',  role:'Media',      color:'#ff4d5e', skin:3, hair:'#141018', style:'short', acc:['headband'],
+    acts:['Rendering video clips','Generating b-roll','Upscaling footage'] },
+  { id:'vox',   name:'Vox',   role:'Audio',      color:'#4d7cff', skin:4, hair:'#0f0c0a', style:'short', acc:['headphones'],
+    acts:['Recording voiceover','Mixing the score','Cleaning dialogue audio','Laying in SFX'] },
+  { id:'cut',   name:'Cut',   role:'Edit',       color:'#b8e04a', skin:1, hair:'#1a1a1a', style:'mohawk',
+    acts:['Assembling the rough cut','Trimming for pace','Color grading'] },
+  { id:'judge', name:'Judge', role:'QC',         color:'#e6e9f2', skin:5, hair:'#9aa0ab', style:'short', acc:['squareGlasses','bowtie'],
+    acts:['Running the QC checklist','Reviewing the final cut','Scoring pass / fail'] },
+  { id:'press', name:'Press', role:'Publish',    color:'#8fa3bf', skin:2, hair:'#3b2a20', style:'short', acc:['fedora'],
+    acts:['Exporting masters','Writing captions','Scheduling posts','Publishing to channels'] },
+  { id:'pulse', name:'Pulse', role:'Analytics',  color:'#ffe14d', skin:0, hair:'#5a3a22', style:'short', acc:['cap'],
+    acts:['Crunching view metrics','Spotting retention dips','Writing the lessons report'] },
+];
+const byId = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+// Hand-offs follow WORKFLOW.md (incl. Vera's Visual Gate before Reel)
+const NEXT = {
+  reed:['iris'], iris:['nova'], nova:['ivy'], ivy:['atlas','vera'], atlas:['vera'], vera:['lens','reel'],
+  lens:['pix'], pix:['frame'], frame:['vera'], reel:['vox'], vox:['cut'], cut:['judge'], judge:['press'],
+  press:['pulse'], pulse:['grok'], grok:[]
+};
+const PODS = [
+  { key:'writers',    name:"WRITERS' ROOM",       x:-7.0, z:-4.2, ids:['reed','iris','nova','ivy'] },
+  { key:'continuity', name:'CANON & CONTINUITY',  x: 0.0, z:-4.2, ids:['atlas','vera'] },
+  { key:'visual',     name:'VISUAL LAB',          x: 7.0, z:-4.2, ids:['lens','pix','frame'] },
+  { key:'production', name:'PRODUCTION BAY',      x:-7.0, z: 2.5, ids:['reel','vox','cut'] },
+  { key:'release',    name:'RELEASE & INSIGHTS',  x: 7.0, z: 2.5, ids:['judge','press','pulse'] },
+];
+AGENTS.forEach(a => { a.pod = a.id === 'grok' ? 'STUDIO COMMAND' : PODS.find(p => p.ids.includes(a.id)).name; });
+
+/* ===================== RENDERER / SCENE / CAMERA ===================== */
+const app = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.25;
+app.appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(innerWidth, innerHeight);
+labelRenderer.domElement.className = 'labels';
+app.appendChild(labelRenderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x04060b);
+scene.fog = new THREE.Fog(0x04060b, 38, 85);
+
+const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 200);
+const HOME = { pos:new THREE.Vector3(0.6, 14.2, 18.6), target:new THREE.Vector3(0.6, 0.2, -0.2) };
+camera.position.copy(HOME.pos);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.copy(HOME.target);
+controls.enableDamping = true;
+controls.dampingFactor = 0.07;
+controls.minDistance = 3;
+controls.maxDistance = 40;
+controls.minPolarAngle = 0.15;
+controls.maxPolarAngle = Math.PI * 0.475;
+controls.autoRotateSpeed = 0.55;
+controls.screenSpacePanning = false;
+controls.update();
+
+let composer = null;
+if (USE_BLOOM) {
+  const rt = new THREE.WebGLRenderTarget(innerWidth, innerHeight, { type:THREE.HalfFloatType, samples:4 });
+  composer = new EffectComposer(renderer, rt);
+  composer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  composer.setSize(innerWidth, innerHeight);
+  composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.55, 0.92));
+  composer.addPass(new OutputPass());
+}
+
+/* ===================== HELPERS ===================== */
+const rng = (() => { let s = 20261006; return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })();
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+const _mats = new Map();
+function M(color, o = {}) {
+  const key = color + '|' + JSON.stringify(o);
+  if (!_mats.has(key)) {
+    _mats.set(key, new THREE.MeshStandardMaterial({
+      color, roughness:o.r ?? 0.7, metalness:o.m ?? 0, emissive:o.e ?? 0x000000, emissiveIntensity:o.ei ?? 1,
+      transparent:o.t ?? false, opacity:o.o ?? 1, side:o.side ?? THREE.FrontSide, flatShading:o.flat ?? false,
+    }));
+  }
+  return _mats.get(key);
+}
+const _geos = new Map();
+const G = (key, fn) => { if (!_geos.has(key)) _geos.set(key, fn()); return _geos.get(key); };
+const box = (w, h, d) => G(`b${w},${h},${d}`, () => new THREE.BoxGeometry(w, h, d));
+const rbox = (w, h, d, r = 0.03) => G(`rb${w},${h},${d},${r}`, () =>
+  new RoundedBoxGeometry(w, h, d, 3, Math.min(r, Math.min(w, h, d) / 2 - 0.0005)));
+const cyl = (rt, rb, h, seg = 20) => G(`c${rt},${rb},${h},${seg}`, () => new THREE.CylinderGeometry(rt, rb, h, seg));
+const sph = (r, ws = 20, hs = 14) => G(`s${r},${ws},${hs}`, () => new THREE.SphereGeometry(r, ws, hs));
+
+function mesh(geo, mat, x = 0, y = 0, z = 0, parent = null, shadow = true) {
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(x, y, z);
+  m.castShadow = shadow; m.receiveShadow = true;
+  if (parent) parent.add(m);
+  return m;
+}
+function canvasTex(w, h, draw, srgb = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'); draw(g, w, h);
+  const t = new THREE.CanvasTexture(c);
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  t.userData = { canvas:c, g };
+  return t;
+}
+const hdr = (hex, k) => new THREE.Color(hex).multiplyScalar(k);
+
+const glowTex = canvasTex(128, 128, (g, w, h) => {
+  const gr = g.createRadialGradient(w/2, h/2, 0, w/2, h/2, w/2);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+});
+const codeTex = canvasTex(256, 512, (g, w, h) => {
+  g.fillStyle = '#0a0f1e'; g.fillRect(0, 0, w, h);
+  const cols = ['#7aa2ff','#c3e88d','#f78c6c','#89ddff','#ffcb6b','#c792ea','#e6e9f5'];
+  for (let y = 10; y < h; y += 12) {
+    if (rng() < 0.12) continue;
+    let x = 10 + Math.floor(rng() * 4) * 12;
+    const n = 1 + Math.floor(rng() * 4);
+    for (let k = 0; k < n && x < w - 12; k++) {
+      const len = Math.min(10 + rng() * 60, w - 12 - x);
+      g.globalAlpha = 0.9; g.fillStyle = cols[Math.floor(rng() * cols.length)];
+      g.fillRect(x, y, len, 5); x += len + 6;
+    }
+  }
+  g.globalAlpha = 1;
+});
+codeTex.wrapS = codeTex.wrapT = THREE.RepeatWrapping;
+codeTex.repeat.set(1, 0.5);
+
+/* ===================== ROOM ===================== */
+const RW = 24, RD = 18, RH = 4;
+const walls = [];   // {group, normal, point}
+
+const floorTex = canvasTex(1024, 1024, (g, w, h) => {
+  g.fillStyle = '#10141f'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 9000; i++) {
+    g.fillStyle = `rgba(${150 + rng()*100|0},${150 + rng()*100|0},255,${rng() * 0.03})`;
+    g.fillRect(rng() * w, rng() * h, 2, 2);
+  }
+  g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 3;
+  for (let i = 0; i <= 4; i++) {
+    g.beginPath(); g.moveTo(i * w / 4, 0); g.lineTo(i * w / 4, h); g.stroke();
+    g.beginPath(); g.moveTo(0, i * h / 4); g.lineTo(w, i * h / 4); g.stroke();
+  }
+});
+floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+floorTex.repeat.set(RW / 8, RD / 8);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(RW, RD),
+  new THREE.MeshStandardMaterial({ map:floorTex, roughness:0.42, metalness:0.2, color:0xbfc6dc }));
+floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(220, 220), new THREE.MeshStandardMaterial({ color:0x05070c, roughness:1 }));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.02; ground.receiveShadow = true; scene.add(ground);
+
+const wallMat = M('#0f1527', { r:0.92 });
+const wainMat = M('#0b1020', { r:0.8 });
+const pilMat  = M('#141c33', { r:0.75 });
+const goldLED = new THREE.MeshStandardMaterial({ color:0x2a1d05, emissive:0xffb444, emissiveIntensity:2.6, roughness:0.6 });
+const goldDim = new THREE.MeshStandardMaterial({ color:0x2a1d05, emissive:0xffb444, emissiveIntensity:0.7, roughness:0.6 });
+const goldMetal = M('#c9a24a', { r:0.32, m:0.85 });
+const darkMetal = M('#1d222e', { r:0.38, m:0.7 });
+const blackPlastic = M('#0c0f17', { r:0.45, m:0.2 });
+
+function makeWall(len, x, z, rotY, normal) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = rotY;
+  mesh(box(len + 0.4, RH, 0.2), wallMat, 0, RH / 2, -0.1, g, false);
+  mesh(box(len, 1.0, 0.04), wainMat, 0, 0.5, 0.02, g, false);
+  mesh(box(len, 0.03, 0.03), goldDim, 0, 1.0, 0.045, g, false);
+  mesh(box(len, 0.035, 0.03), goldLED, 0, RH - 0.06, 0.03, g, false);   // cove LED
+  mesh(box(len, 0.12, 0.05), M('#070a12'), 0, 0.06, 0.03, g, false);   // baseboard
+  for (let p = -len / 2 + 1.5; p <= len / 2 - 1.4; p += 3) mesh(box(0.22, RH - 1.1, 0.06), pilMat, p, 1.0 + (RH - 1.1) / 2, 0.03, g, false);
+  scene.add(g);
+  walls.push({ group:g, normal, point:new THREE.Vector3(x, 0, z) });
+  return g;
+}
+const backWall  = makeWall(RW, 0, -RD / 2, 0,             new THREE.Vector3(0, 0, 1));
+const frontWall = makeWall(RW, 0,  RD / 2, Math.PI,       new THREE.Vector3(0, 0, -1));
+const leftWall  = makeWall(RD, -RW / 2, 0, Math.PI / 2,   new THREE.Vector3(1, 0, 0));
+const rightWall = makeWall(RD,  RW / 2, 0, -Math.PI / 2,  new THREE.Vector3(-1, 0, 0));
+
+// back wall: night-city window strip
+const cityTex = canvasTex(2048, 256, (g, w, h) => {
+  const gr = g.createLinearGradient(0, 0, 0, h);
+  gr.addColorStop(0, '#050816'); gr.addColorStop(0.55, '#141038'); gr.addColorStop(1, '#3b1c3c');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 160; i++) { g.fillStyle = `rgba(255,255,255,${rng() * 0.6})`; g.fillRect(rng() * w, rng() * h * 0.45, 1.5, 1.5); }
+  g.fillStyle = 'rgba(255,214,140,.9)'; g.beginPath(); g.arc(w * 0.78, h * 0.22, 14, 0, Math.PI * 2); g.fill();
+  for (let layer = 0; layer < 2; layer++) {
+    let x = -20;
+    while (x < w) {
+      const bw = 30 + rng() * 90, bh = (layer ? 60 : 110) + rng() * (layer ? 120 : 130);
+      g.fillStyle = layer ? '#05060d' : '#0b0d1c'; g.fillRect(x, h - bh, bw, bh);
+      for (let wy = h - bh + 8; wy < h - 6; wy += 9) for (let wx = x + 5; wx < x + bw - 5; wx += 8) {
+        if (rng() < (layer ? 0.22 : 0.12)) {
+          g.fillStyle = rng() < 0.7 ? `rgba(255,${190 + rng()*40|0},120,${0.4 + rng()*0.5})` : `rgba(150,190,255,${0.3 + rng()*0.5})`;
+          g.fillRect(wx, wy, 3, 4);
+        }
+      }
+      x += bw + rng() * 8;
+    }
+  }
+});
+{
+  const winW = RW - 3, winH = 1.7, winY = 2.55;
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(winW, winH),
+    new THREE.MeshBasicMaterial({ map:cityTex, color:new THREE.Color(0.85, 0.85, 0.95) }));
+  glass.position.set(0, winY, 0.03); backWall.add(glass);
+  mesh(box(winW + 0.2, 0.08, 0.14), darkMetal, 0, winY - winH / 2 - 0.04, 0.07, backWall);
+  mesh(box(winW + 0.2, 0.08, 0.1), darkMetal, 0, winY + winH / 2 + 0.04, 0.06, backWall);
+  for (let i = 0; i <= 8; i++) mesh(box(0.07, winH, 0.08), darkMetal, -winW / 2 + i * winW / 8, winY, 0.06, backWall);
+}
+
+// left wall: film posters
+const POSTERS = [
+  { t:'NEON TIDE',     s:'THE CITY NEVER SLEEPS', a:'#1a3d8a', b:'#e8559a' },
+  { t:'THE LAST REEL', s:'EVERY FRAME COUNTS',    a:'#3a1d06', b:'#f5c451' },
+  { t:'OCEAN OF TIME', s:'1983 · STATION ONE',    a:'#062636', b:'#36c5f0' },
+  { t:'GOLD HOUR',     s:'A STORY OF LIGHT',      a:'#3a1022', b:'#ff9f43' },
+];
+function posterTex(p) {
+  return canvasTex(320, 480, (g, w, h) => {
+    const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, p.a); gr.addColorStop(1, '#040408');
+    g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    const rg = g.createRadialGradient(w / 2, h * 0.4, 5, w / 2, h * 0.4, w * 0.5);
+    rg.addColorStop(0, p.b); rg.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = rg; g.fillRect(0, 0, w, h);
+    g.fillStyle = 'rgba(0,0,0,.85)';
+    g.beginPath(); g.arc(w / 2, h * 0.43, 26, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.moveTo(w / 2 - 70, h * 0.68); g.quadraticCurveTo(w / 2, h * 0.43, w / 2 + 70, h * 0.68); g.fill();
+    g.fillRect(0, h * 0.68, w, 4);
+    g.textAlign = 'center';
+    g.fillStyle = 'rgba(255,255,255,.65)'; g.font = '600 12px Helvetica,Arial,sans-serif';
+    g.fillText('A VOLTAIRE STUDIO PICTURE', w / 2, 30);
+    g.fillStyle = '#fff4d6'; g.font = 'bold 36px Georgia,"Times New Roman",serif';
+    g.fillText(p.t, w / 2, h * 0.79);
+    g.fillStyle = p.b; g.font = '600 12px Helvetica,Arial,sans-serif'; g.fillText(p.s, w / 2, h * 0.84);
+    g.fillStyle = 'rgba(255,255,255,.28)';
+    for (let i = 0; i < 4; i++) g.fillRect(40 + (i % 2) * 6, h * 0.89 + i * 8, w - 80 - (i % 2) * 12, 3);
+  });
+}
+POSTERS.forEach((p, i) => {
+  const lx = -6 + i * 4, y = 2.25;
+  mesh(box(1.25, 1.8, 0.05), goldMetal, lx, y, 0.04, leftWall);
+  const tex = posterTex(p);
+  const pm = new THREE.Mesh(new THREE.PlaneGeometry(1.12, 1.68),
+    new THREE.MeshStandardMaterial({ map:tex, emissive:0xffffff, emissiveMap:tex, emissiveIntensity:0.55, roughness:0.5 }));
+  pm.position.set(lx, y, 0.07); leftWall.add(pm);
+  mesh(box(0.5, 0.04, 0.08), goldLED, lx, y + 1.02, 0.12, leftWall, false);
+});
+
+// right wall: live pipeline board, door, neon sign
+const boardTex = canvasTex(1280, 720, () => {});
+{
+  const lx = -1.2;
+  mesh(box(4.7, 2.75, 0.08), M('#06080f', { r:0.3, m:0.5 }), lx, 2.2, 0.05, rightWall);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 2.53), new THREE.MeshBasicMaterial({ map:boardTex }));
+  scr.position.set(lx, 2.2, 0.1); rightWall.add(scr);
+  const dx = -6.6;
+  mesh(box(1.3, 2.45, 0.06), goldMetal, dx, 1.22, 0.03, rightWall);
+  mesh(box(1.16, 2.35, 0.08), M('#151b2c', { r:0.5, m:0.2 }), dx, 1.18, 0.05, rightWall);
+  mesh(box(0.04, 0.3, 0.05), goldMetal, dx + 0.45, 1.1, 0.12, rightWall);
+  mesh(box(0.6, 0.12, 0.03), M('#0a0d16', { e:0x36ff9a, ei:1.6 }), dx, 2.65, 0.06, rightWall, false);
+  const neon = canvasTex(512, 128, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = 'italic bold 64px Georgia,serif'; g.shadowColor = '#ffb444'; g.shadowBlur = 18;
+    g.fillStyle = '#ffd98a'; g.fillText('Craft Caffeine', w / 2, h / 2);
+  });
+  const nm = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.6), new THREE.MeshBasicMaterial({ map:neon, transparent:true, color:hdr(0xffffff, 1.8), depthWrite:false }));
+  nm.position.set(6.4, 2.75, 0.06); rightWall.add(nm);
+}
+
+// front wall: studio logo + bookshelves
+{
+  const logo = canvasTex(1024, 192, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = '#ffd77a'; g.shadowColor = '#ffb444'; g.shadowBlur = 16;
+    g.font = 'bold 84px Georgia,"Times New Roman",serif'; g.fillText('VOLTAIRE', w / 2, 70);
+    g.shadowBlur = 6; g.font = '600 30px Helvetica,Arial,sans-serif'; g.fillText('A I   C O N T E N T   S T U D I O', w / 2, 150);
+  });
+  const lm = new THREE.Mesh(new THREE.PlaneGeometry(5, 0.94), new THREE.MeshBasicMaterial({ map:logo, transparent:true, color:hdr(0xffffff, 1.5), depthWrite:false }));
+  lm.position.set(0, 2.7, 0.06); frontWall.add(lm);
+  for (const sx of [-5.2, 5.2]) {
+    const sh = new THREE.Group(); sh.position.set(sx, 0, 0.25); frontWall.add(sh);
+    mesh(box(2.2, 2.4, 0.4), M('#121829', { r:0.7 }), 0, 1.2, 0, sh);
+    for (let r = 0; r < 4; r++) {
+      mesh(box(2.1, 0.03, 0.36), goldMetal, 0, 0.35 + r * 0.55, 0.03, sh);
+      let x = -0.95;
+      while (x < 0.9) {
+        const bw = 0.05 + rng() * 0.07, bh = 0.28 + rng() * 0.18;
+        const c = ['#7b2d26','#1f4e5f','#c9a24a','#3c2f63','#2d5a3d','#8a8f9c'][Math.floor(rng() * 6)];
+        mesh(box(bw, bh, 0.26), M(c, { r:0.8 }), x + bw / 2, 0.37 + r * 0.55 + bh / 2, 0.05, sh);
+        x += bw + 0.012 + (rng() < 0.08 ? 0.2 : 0);
+      }
+    }
+  }
+}
+
+// ceiling — only shown when the camera is inside the room below it
+const ceiling = new THREE.Group(); scene.add(ceiling);
+{
+  const c = new THREE.Mesh(new THREE.PlaneGeometry(RW, RD), M('#0a0e19', { r:0.95 }));
+  c.rotation.x = Math.PI / 2; c.position.y = RH; ceiling.add(c);
+  for (let x = -9; x <= 9; x += 6) for (let z = -6; z <= 6; z += 6) {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.2), new THREE.MeshBasicMaterial({ color:hdr(0xffe2b0, 0.9) }));
+    p.rotation.x = Math.PI / 2; p.position.set(x, RH - 0.01, z); ceiling.add(p);
+  }
+}
+
+/* ===================== LIGHTING ===================== */
+scene.add(new THREE.HemisphereLight(0x3a4f86, 0x080a12, 0.9));
+scene.add(new THREE.AmbientLight(0x1a2240, 0.35));
+const key = new THREE.DirectionalLight(0xffd6a0, 1.5);
+key.position.set(8, 16, 9); key.target.position.set(0, 0, -1);
+key.castShadow = true;
+Object.assign(key.shadow.camera, { left:-15, right:15, top:12, bottom:-12, near:2, far:45 });
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.bias = -0.0004; key.shadow.normalBias = 0.025;
+scene.add(key, key.target);
+const moon = new THREE.DirectionalLight(0x6c86ff, 0.55);
+moon.position.set(-3, 7, -16); scene.add(moon);
+
+function pendantBar(x, z, len) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
+  for (const s of [-1, 1]) mesh(cyl(0.006, 0.006, RH - 2.95, 6), darkMetal, s * len * 0.38, (RH + 2.95) / 2, 0, g, false);
+  mesh(box(len, 0.06, 0.2), darkMetal, 0, 2.92, 0, g, false);
+  mesh(box(len - 0.08, 0.012, 0.13), new THREE.MeshStandardMaterial({ color:0x221800, emissive:0xffc070, emissiveIntensity:1.8 }), 0, 2.885, 0, g, false);
+  const L = new THREE.PointLight(0xffb866, 9, 9, 1.6); L.position.set(x, 2.7, z); scene.add(L);
+}
+function pendantRing(x, z) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g);
+  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2; mesh(cyl(0.005, 0.005, RH - 3.0, 6), darkMetal, Math.cos(a) * 0.55, (RH + 3.0) / 2, Math.sin(a) * 0.55, g, false); }
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.035, 12, 64), new THREE.MeshStandardMaterial({ color:0x221800, emissive:0xffc46b, emissiveIntensity:1.5 }));
+  ring.rotation.x = Math.PI / 2; ring.position.y = 3.0; g.add(ring);
+  const L = new THREE.PointLight(0xffc27a, 12, 10, 1.6); L.position.set(x, 2.8, z); scene.add(L);
+}
+
+/* ===================== FURNITURE ===================== */
+const chairBaseGeo = (() => {
+  const parts = [];
+  for (let i = 0; i < 5; i++) {
+    const a = i / 5 * Math.PI * 2;
+    const leg = new THREE.BoxGeometry(0.05, 0.035, 0.3); leg.translate(0, 0.075, 0.15); leg.rotateY(a); parts.push(leg);
+    const cas = new THREE.SphereGeometry(0.03, 8, 6); cas.translate(Math.sin(a) * 0.29, 0.03, Math.cos(a) * 0.29); parts.push(cas);
+  }
+  const hub = new THREE.CylinderGeometry(0.05, 0.06, 0.06, 12); hub.translate(0, 0.08, 0); parts.push(hub);
+  return mergeGeometries(parts.map(p => p.toNonIndexed()));
+})();
+
+function buildChair(accent, big) {
+  const g = new THREE.Group();
+  const fabric = M(big ? '#2a2215' : '#1a1f2c', { r:0.85 });
+  mesh(chairBaseGeo, darkMetal, 0, 0, 0, g);
+  mesh(cyl(0.028, 0.028, 0.32, 10), darkMetal, 0, 0.27, 0, g);
+  mesh(rbox(0.52, 0.08, 0.5, 0.035), fabric, 0, 0.45, 0, g);
+  const back = new THREE.Group(); back.position.set(0, 0.5, -0.25); back.rotation.x = -0.1; g.add(back);
+  mesh(box(0.06, 0.2, 0.03), darkMetal, 0, 0.06, -0.01, back);
+  mesh(rbox(0.48, big ? 0.72 : 0.56, 0.07, 0.03), fabric, 0, big ? 0.48 : 0.4, 0, back);
+  mesh(box(0.05, big ? 0.5 : 0.36, 0.01), new THREE.MeshStandardMaterial({ color:accent, emissive:accent, emissiveIntensity:0.5 }),
+    0, big ? 0.48 : 0.4, -0.04, back, false);   // accent stripe on the back
+  for (const s of [-1, 1]) {
+    mesh(box(0.03, 0.18, 0.03), darkMetal, s * 0.29, 0.56, -0.02, g);
+    mesh(rbox(0.06, 0.03, 0.24, 0.012), blackPlastic, s * 0.29, 0.66, 0.0, g);
+  }
+  return g;
+}
+
+function addProp(type, parent, x, z, H, color) {
+  const g = new THREE.Group(); g.position.set(x, H, z); parent.add(g);
+  switch (type) {
+    case 'mug': {
+      mesh(cyl(0.04, 0.036, 0.1, 14), M(color, { r:0.4 }), 0, 0.05, 0, g);
+      const h = mesh(G('mugh', () => new THREE.TorusGeometry(0.025, 0.007, 6, 12)), M(color, { r:0.4 }), 0.045, 0.05, 0, g); h.rotation.y = Math.PI / 2;
+      break;
+    }
+    case 'plant':
+      mesh(cyl(0.06, 0.045, 0.1, 12), M('#d9d4c7', { r:0.6 }), 0, 0.05, 0, g);
+      for (let i = 0; i < 5; i++) mesh(G('leaf', () => new THREE.IcosahedronGeometry(0.06, 0)), M(['#2f7a45','#3f9a55','#27663a'][i % 3], { r:0.8, flat:true }),
+        (rng() - 0.5) * 0.08, 0.14 + rng() * 0.08, (rng() - 0.5) * 0.08, g);
+      break;
+    case 'papers':
+      for (let i = 0; i < 4; i++) { const p = mesh(box(0.21, 0.006, 0.29), M(i % 2 ? '#e8e4d8' : '#f4f1e8', { r:0.9 }), 0, 0.004 + i * 0.007, 0, g); p.rotation.y = (rng() - 0.5) * 0.4; }
+      break;
+    case 'books':
+      for (let i = 0; i < 3; i++) mesh(box(0.05, 0.24, 0.17), M(['#7b2d26','#1f4e5f','#c9a24a','#3c2f63'][i], { r:0.8 }), i * 0.055, 0.12, 0, g);
+      break;
+    case 'lamp': {
+      mesh(cyl(0.07, 0.08, 0.02, 16), darkMetal, 0, 0.01, 0, g);
+      const arm = mesh(cyl(0.01, 0.01, 0.4, 6), darkMetal, -0.03, 0.2, 0, g); arm.rotation.z = 0.25;
+      const head = mesh(G('lamph', () => new THREE.ConeGeometry(0.07, 0.1, 16, 1, true)), M('#c9a24a', { r:0.3, m:0.8, side:THREE.DoubleSide }), -0.08, 0.4, 0, g);
+      head.rotation.z = -0.9;
+      mesh(sph(0.025, 10, 8), new THREE.MeshStandardMaterial({ color:0x221800, emissive:0xffc070, emissiveIntensity:4 }), -0.1, 0.37, 0, g, false);
+      break;
+    }
+    case 'clapper': {
+      const c = new THREE.Group(); c.rotation.y = 0.5; g.add(c);
+      mesh(box(0.22, 0.16, 0.015), blackPlastic, 0, 0.08, 0, c);
+      for (let i = 0; i < 4; i++) mesh(box(0.025, 0.02, 0.017), M('#f2f2f2'), -0.08 + i * 0.055, 0.14, 0, c, false);
+      const top = mesh(box(0.22, 0.035, 0.016), M('#f2f2f2', { r:0.5 }), 0, 0.185, 0, c); top.rotation.z = 0.18;
+      break;
+    }
+    case 'headphones': {
+      const b = mesh(G('dhp', () => new THREE.TorusGeometry(0.08, 0.012, 6, 16, Math.PI)), blackPlastic, 0, 0.03, 0, g); b.rotation.x = -Math.PI / 2;
+      for (const s of [-1, 1]) mesh(cyl(0.035, 0.035, 0.03, 12), M(color, { r:0.5 }), s * 0.08, 0.02, 0, g);
+      break;
+    }
+    case 'tablet': {
+      mesh(rbox(0.2, 0.012, 0.28, 0.01), blackPlastic, 0, 0.006, 0, g);
+      const s = new THREE.Mesh(G('tabs', () => new THREE.PlaneGeometry(0.18, 0.26)), new THREE.MeshBasicMaterial({ color:hdr(color, 0.5) }));
+      s.rotation.x = -Math.PI / 2; s.position.y = 0.013; g.add(s);
+      break;
+    }
+  }
+  g.rotation.y = (rng() - 0.5) * 0.6;
+  return g;
+}
+
+function addPlant(x, z, s = 1) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s); scene.add(g);
+  mesh(cyl(0.26, 0.2, 0.55, 18), M('#1a1f2c', { r:0.5, m:0.3 }), 0, 0.275, 0, g);
+  mesh(cyl(0.27, 0.27, 0.03, 18), goldMetal, 0, 0.55, 0, g);
+  for (let i = 0; i < 9; i++) {
+    const r = 0.18 + rng() * 0.16;
+    mesh(G('pl' + i, () => new THREE.IcosahedronGeometry(r, 0)), M(['#2a6b3e','#348a4c','#1f5530'][i % 3], { r:0.8, flat:true }),
+      (rng() - 0.5) * 0.5, 0.8 + rng() * 0.9, (rng() - 0.5) * 0.5, g);
+  }
+  return g;
+}
+
+/* ===================== NPC FIGURES (chibi low-poly, built facing +Z, seated) ===================== */
+const SKINS = ['#f3cfa8', '#e2b084', '#c98e62', '#a86d47', '#7d4b2e', '#f6dcc2'];
+
+function buildHead(a, head) {
+  const r = 0.21;
+  const parts = { eyes:null, visor:null, antennaTip:null };
+  if (a.robot) {
+    const shell = M('#2a2f3c', { r:0.32, m:0.75 });
+    mesh(rbox(0.46, 0.4, 0.4, 0.1), shell, 0, 0, 0, head);
+    const visorMat = new THREE.MeshStandardMaterial({ color:0x1a1200, emissive:0xffc44d, emissiveIntensity:2.2 });
+    parts.visor = mesh(rbox(0.36, 0.11, 0.03, 0.012), visorMat, 0, 0.03, 0.2, head, false);
+    parts.visorMat = visorMat;
+    for (const s of [-1, 1]) { const e = mesh(cyl(0.07, 0.07, 0.05, 18), goldMetal, s * 0.24, 0, 0, head); e.rotation.z = Math.PI / 2; }
+    mesh(cyl(0.012, 0.012, 0.2, 8), goldMetal, 0.1, 0.29, 0, head);
+    parts.antennaTip = mesh(sph(0.04, 12, 10), new THREE.MeshStandardMaterial({ color:0x1a1200, emissive:0xffd36b, emissiveIntensity:3 }), 0.1, 0.4, 0, head, false);
+    mesh(box(0.12, 0.012, 0.01), M('#0a0c12'), 0, -0.1, 0.205, head, false);
+    return parts;
+  }
+  const skin = M(SKINS[a.skin ?? 0], { r:0.62 });
+  const hairM = M(a.hair || '#222', { r:0.78, side:THREE.DoubleSide });
+  mesh(sph(r, 28, 20), skin, 0, 0, 0, head);
+  for (const s of [-1, 1]) mesh(sph(0.045, 10, 8), skin, s * 0.205, -0.01, 0, head);
+  const eyes = new THREE.Group(); head.add(eyes);
+  for (const s of [-1, 1]) mesh(sph(0.03, 12, 10), M('#0b0b12', { r:0.3 }), s * 0.075, 0.005, 0.18, eyes, false);
+  for (const s of [-1, 1]) mesh(sph(0.009, 6, 6), new THREE.MeshBasicMaterial({ color:0xffffff }), s * 0.068, 0.016, 0.207, eyes, false);
+  parts.eyes = eyes;
+  mesh(box(0.05, 0.012, 0.01), M('#5a2a24'), 0, -0.085, 0.192, head, false);
+  for (const s of [-1, 1]) {
+    const bl = new THREE.Mesh(G('blush', () => new THREE.CircleGeometry(0.03, 14)), new THREE.MeshBasicMaterial({ color:0xff7a8a, transparent:true, opacity:0.28, depthWrite:false }));
+    bl.position.set(s * 0.12, -0.05, 0.168); bl.rotation.y = s * 0.6; head.add(bl);
+  }
+  const cap = () => { const c = mesh(G('hcap', () => new THREE.SphereGeometry(0.222, 28, 14, 0, Math.PI * 2, 0, Math.PI * 0.52)), hairM, 0, 0, 0, head); c.rotation.x = -0.38; return c; };
+  const curtain = (h, y, open) => {
+    const geo = G(`curt${h},${open}`, () => new THREE.CylinderGeometry(0.226, 0.235, h, 28, 1, true, open * Math.PI, (2 - 2 * open) * Math.PI));
+    mesh(geo, hairM, 0, y, 0, head);
+  };
+  switch (a.style) {
+    case 'short': cap(); break;
+    case 'bun': cap(); mesh(sph(0.09, 14, 12), hairM, 0, 0.19, -0.1, head); break;
+    case 'ponytail': {
+      cap(); mesh(sph(0.03, 8, 8), M(a.color), 0, 0.06, -0.225, head);
+      const p = mesh(G('ptail', () => new THREE.CapsuleGeometry(0.055, 0.2, 4, 10)), hairM, 0, -0.06, -0.27, head); p.rotation.x = 0.45;
+      break;
+    }
+    case 'long': cap(); curtain(0.42, -0.13, 0.22); break;
+    case 'bob': cap(); curtain(0.2, -0.04, 0.28); break;
+    case 'bald': break;
+    case 'mohawk':
+      for (let i = 0; i < 6; i++) {
+        const ang = -0.75 + i * 0.4;
+        const m = mesh(box(0.05, 0.13, 0.08), hairM, 0, 0.215 * Math.cos(ang), -0.215 * Math.sin(ang), head);
+        m.rotation.x = -ang;
+      }
+      break;
+  }
+  for (const acc of (a.acc || [])) {
+    switch (acc) {
+      case 'glasses': {
+        const fm = M('#1a1a1a', { r:0.4, m:0.5 });
+        for (const s of [-1, 1]) mesh(G('gl', () => new THREE.TorusGeometry(0.048, 0.009, 6, 18)), fm, s * 0.075, 0.005, 0.205, head, false);
+        mesh(box(0.05, 0.01, 0.01), fm, 0, 0.012, 0.21, head, false);
+        break;
+      }
+      case 'squareGlasses': {
+        for (const s of [-1, 1]) { const g = mesh(G('sgl', () => new THREE.TorusGeometry(0.055, 0.009, 4, 4)), goldMetal, s * 0.075, 0.005, 0.205, head, false); g.rotation.z = Math.PI / 4; }
+        mesh(box(0.04, 0.01, 0.01), goldMetal, 0, 0.012, 0.21, head, false);
+        break;
+      }
+      case 'beard': {
+        const b = mesh(sph(0.16, 16, 12), M(a.hair, { r:0.85 }), 0, -0.11, 0.07, head); b.scale.set(1.18, 0.78, 0.85);
+        mesh(box(0.11, 0.025, 0.03), M(a.hair, { r:0.85 }), 0, -0.055, 0.195, head, false);
+        break;
+      }
+      case 'headphones': {
+        mesh(G('hpb', () => new THREE.TorusGeometry(0.24, 0.022, 8, 28, Math.PI)), blackPlastic, 0, 0, 0, head);
+        for (const s of [-1, 1]) { const c = mesh(cyl(0.075, 0.075, 0.07, 20), M(a.color, { r:0.4, m:0.3 }), s * 0.23, 0, 0, head); c.rotation.z = Math.PI / 2; }
+        break;
+      }
+      case 'capBack':
+      case 'cap': {
+        const fwd = acc === 'cap';
+        const capM = M(fwd ? '#1d2433' : a.color, { r:0.7 });
+        mesh(G('capd', () => new THREE.SphereGeometry(0.228, 28, 12, 0, Math.PI * 2, 0, Math.PI * 0.45)), capM, 0, 0.012, 0, head);
+        const brim = mesh(G('brim', () => new THREE.CylinderGeometry(0.16, 0.16, 0.014, 24, 1, false, 0, Math.PI)), fwd ? M(a.color, { r:0.7 }) : capM,
+          0, 0.07, fwd ? 0.15 : -0.15, head);
+        brim.rotation.y = fwd ? -Math.PI / 2 : Math.PI / 2;
+        brim.rotation.x = fwd ? 0.15 : -0.15;
+        break;
+      }
+      case 'beret': {
+        const b = mesh(sph(0.2, 24, 12), M('#2b1b2e', { r:0.9 }), 0.03, 0.18, -0.01, head);
+        b.scale.set(1.18, 0.36, 1.18); b.rotation.z = 0.25;
+        mesh(cyl(0.012, 0.012, 0.04, 6), M('#2b1b2e'), 0.06, 0.25, 0, head);
+        break;
+      }
+      case 'headband': { const h = mesh(G('hband', () => new THREE.TorusGeometry(0.222, 0.024, 8, 32)), M('#f2f2f2', { r:0.6 }), 0, 0.08, 0, head); h.rotation.x = Math.PI / 2 - 0.25; break; }
+      case 'catEars': {
+        mesh(G('cband', () => new THREE.TorusGeometry(0.225, 0.012, 6, 28, Math.PI)), M('#1b1b22'), 0, 0.02, 0.02, head);
+        for (const s of [-1, 1]) {
+          const e = mesh(G('cear', () => new THREE.ConeGeometry(0.065, 0.12, 4)), M(a.color, { r:0.6, flat:true }), s * 0.13, 0.21, 0.02, head);
+          e.rotation.z = -s * 0.4;
+        }
+        break;
+      }
+      case 'fedora': {
+        const fm = M('#2f3542', { r:0.75 });
+        mesh(cyl(0.34, 0.34, 0.02, 32), fm, 0, 0.13, 0, head);
+        mesh(cyl(0.19, 0.215, 0.18, 32), fm, 0, 0.23, 0, head);
+        mesh(cyl(0.217, 0.217, 0.04, 32), goldMetal, 0, 0.165, 0, head);
+        break;
+      }
+    }
+  }
+  return parts;
+}
+
+function buildFigure(a) {
+  const fig = new THREE.Group();
+  const shirt = a.robot ? M('#c9a24a', { r:0.35, m:0.7 }) : M(a.color, { r:0.65 });
+  const pants = M(a.robot ? '#1b2030' : '#1d2433', { r:0.8 });
+  const skin = a.robot ? M('#2a2f3c', { r:0.32, m:0.75 }) : M(SKINS[a.skin ?? 0], { r:0.62 });
+  const shoe = M('#0b0d13', { r:0.5 });
+
+  mesh(rbox(0.4, 0.15, 0.34, 0.05), pants, 0, 0.56, 0, fig);
+  for (const s of [-1, 1]) {
+    mesh(rbox(0.16, 0.15, 0.42, 0.05), pants, s * 0.1, 0.56, 0.2, fig);
+    mesh(rbox(0.14, 0.46, 0.15, 0.05), pants, s * 0.1, 0.3, 0.4, fig);
+    mesh(rbox(0.16, 0.08, 0.25, 0.035), shoe, s * 0.1, 0.04, 0.45, fig);
+  }
+  const body = new THREE.Group(); body.position.y = 0.6; fig.add(body);
+  mesh(rbox(0.46, 0.48, 0.3, 0.1), shirt, 0, 0.25, 0, body);
+  if (a.robot) {
+    mesh(rbox(0.3, 0.26, 0.02, 0.008), M('#1b2030', { r:0.4, m:0.5 }), 0, 0.27, 0.15, body, false);
+    mesh(sph(0.035, 12, 10), new THREE.MeshStandardMaterial({ color:0x111111, emissive:0xffd36b, emissiveIntensity:3 }), 0, 0.3, 0.165, body, false);
+  } else {
+    mesh(rbox(0.2, 0.05, 0.05, 0.02), M('#' + new THREE.Color(a.color).multiplyScalar(0.7).getHexString(), { r:0.7 }), 0, 0.47, 0.08, body, false);
+  }
+  mesh(cyl(0.065, 0.075, 0.1, 12), skin, 0, 0.52, 0, body);
+  if ((a.acc || []).includes('bowtie')) {
+    for (const s of [-1, 1]) { const c = mesh(G('bow', () => new THREE.ConeGeometry(0.035, 0.07, 4)), M('#b8343f', { r:0.6 }), s * 0.035, 0.44, 0.16, body, false); c.rotation.z = s * Math.PI / 2; }
+    mesh(sph(0.018, 8, 6), M('#b8343f'), 0, 0.44, 0.165, body, false);
+  }
+  const head = new THREE.Group(); head.position.y = 0.76; body.add(head);
+  const hp = buildHead(a, head);
+
+  const arms = [];
+  for (const s of [-1, 1]) {
+    const sh = new THREE.Group(); sh.position.set(s * 0.285, 0.4, 0); body.add(sh);
+    mesh(G('upper', () => new THREE.CapsuleGeometry(0.066, 0.16, 4, 10)), shirt, 0, -0.13, 0, sh);
+    const el = new THREE.Group(); el.position.y = -0.26; sh.add(el);
+    mesh(G('fore', () => new THREE.CapsuleGeometry(0.056, 0.18, 4, 10)), skin, 0, -0.14, 0, el);
+    mesh(sph(0.062, 12, 10), skin, 0, -0.29, 0, el);
+    arms.push({ sh, el, s });
+  }
+  // 'learning' prop: an open book held in both hands
+  const book = new THREE.Group(); book.position.set(0, 0.3, 0.43); book.rotation.x = -0.75; book.visible = false; body.add(book);
+  const cover = M('#' + new THREE.Color(a.color).multiplyScalar(0.55).getHexString(), { r:0.6 });
+  const paper = M('#f1e9d6', { r:0.9, e:0x2a261c });
+  for (const s of [-1, 1]) {
+    const half = new THREE.Group(); half.rotation.z = s * 0.2; book.add(half);
+    mesh(box(0.15, 0.012, 0.21), cover, s * 0.077, 0, 0, half, false);
+    mesh(box(0.14, 0.014, 0.195), paper, s * 0.072, 0.012, 0, half, false);
+    for (let k = 0; k < 4; k++) mesh(box(0.1, 0.0015, 0.008), M('#8a8274'), s * 0.075, 0.02, -0.06 + k * 0.035, half, false);
+  }
+  // 'leads' prop: a magnifying glass in the right hand
+  const mag = new THREE.Group(); mag.position.set(0, -0.3, 0); mag.visible = false; arms[1].el.add(mag);
+  mesh(cyl(0.016, 0.02, 0.13, 10), M('#2a1d12', { r:0.5 }), 0, -0.05, 0, mag, false);
+  const ringG = new THREE.Group(); ringG.position.y = -0.19; ringG.rotation.y = 0.5; mag.add(ringG);
+  mesh(G('magRing', () => new THREE.TorusGeometry(0.075, 0.012, 8, 28)), goldMetal, 0, 0, 0, ringG, false);
+  const lens = new THREE.Mesh(G('magLens', () => new THREE.CircleGeometry(0.072, 28)),
+    new THREE.MeshStandardMaterial({ color:0xbfe6ff, emissive:0x3a7fbf, emissiveIntensity:0.6, transparent:true, opacity:0.45, roughness:0.05, metalness:0.1, side:THREE.DoubleSide }));
+  ringG.add(lens);
+  return { fig, body, head, arms, book, mag, ...hp };
+}
+
+/* ===================== WORKSTATIONS ===================== */
+const pickables = [];
+const PROPSETS = {
+  reed:['books','mug'], iris:['plant','papers'], nova:['papers','mug'], ivy:['papers','lamp'], atlas:['books','lamp'],
+  vera:['tablet','mug'], lens:['clapper','mug'], pix:['tablet','plant'], frame:['papers','clapper'], reel:['clapper','mug'],
+  vox:['headphones','mug'], cut:['tablet','plant'], judge:['papers','lamp'], press:['tablet','mug'], pulse:['tablet','plant'],
+};
+
+function buildWorkstation(a, big = false) {
+  const W = big ? 2.1 : 1.45, D = big ? 0.95 : 0.75, H = 0.74, seatZ = big ? 0.74 : 0.62;
+  const ws = new THREE.Group();
+  const topMat = big ? M('#221a10', { r:0.32, m:0.25 }) : M('#1c2335', { r:0.45, m:0.12 });
+  const sideMat = big ? M('#14100a', { r:0.4, m:0.3 }) : darkMetal;
+  mesh(rbox(W, 0.05, D, 0.018), topMat, 0, H - 0.025, 0, ws);
+  if (big) {
+    mesh(box(W + 0.01, 0.012, D + 0.01), goldMetal, 0, H - 0.05, 0, ws);
+    mesh(box(W, 0.6, 0.04), sideMat, 0, H - 0.36, -D / 2 + 0.03, ws);
+    const plate = canvasTex(512, 96, (g, w, h) => {
+      g.fillStyle = '#0d0a05'; g.fillRect(0, 0, w, h); g.strokeStyle = '#c9a24a'; g.lineWidth = 4; g.strokeRect(6, 6, w - 12, h - 12);
+      g.fillStyle = '#ffd77a'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.font = 'bold 36px Georgia,serif'; g.fillText('GROK BOT · STUDIO MANAGER', w / 2, h / 2 + 2);
+    });
+    const pl = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.28), new THREE.MeshBasicMaterial({ map:plate, color:hdr(0xffffff, 1.15) }));
+    pl.position.set(0, H - 0.25, -D / 2 + 0.005); pl.rotation.y = Math.PI; ws.add(pl);
+  } else {
+    mesh(box(W - 0.14, 0.36, 0.02), darkMetal, 0, H - 0.28, -D / 2 + 0.05, ws);
+  }
+  for (const sx of [-1, 1]) {
+    mesh(box(0.05, H - 0.05, D - 0.1), sideMat, sx * (W / 2 - 0.06), (H - 0.05) / 2, 0, ws);
+    mesh(box(0.07, 0.02, D - 0.04), darkMetal, sx * (W / 2 - 0.06), 0.01, 0, ws);
+  }
+  // monitors
+  const screens = [];
+  const tint = new THREE.Color(a.color).lerp(new THREE.Color(0xffffff), 0.55);
+  const monXs = big ? [-0.4, 0.4] : [0];
+  for (const mx of monXs) {
+    const mon = new THREE.Group(); mon.position.set(mx, H, -0.17); mon.rotation.y = -mx * 0.6; ws.add(mon);
+    mesh(box(0.22, 0.015, 0.16), darkMetal, 0, 0.008, 0, mon);
+    mesh(box(0.04, 0.26, 0.03), darkMetal, 0, 0.14, -0.03, mon);
+    mesh(rbox(0.68, 0.42, 0.035, 0.012), blackPlastic, 0, 0.42, 0, mon);
+    const map = codeTex.clone(); map.needsUpdate = true; map.offset.y = Math.random();
+    const scrMat = new THREE.MeshBasicMaterial({ map, color:tint.clone().multiplyScalar(0.22) });
+    const scr = new THREE.Mesh(G('scr', () => new THREE.PlaneGeometry(0.63, 0.37)), scrMat);
+    scr.position.set(0, 0.42, 0.0185); mon.add(scr);
+    screens.push(scrMat);
+  }
+  // keyboard / mouse
+  mesh(rbox(0.46, 0.022, 0.15, 0.008), M('#1a1f2b', { r:0.5 }), 0, H + 0.011, 0.19, ws);
+  const keysMat = new THREE.MeshBasicMaterial({ color:tint.clone().multiplyScalar(0.05) });
+  const keys = new THREE.Mesh(G('keys', () => new THREE.PlaneGeometry(0.42, 0.11)), keysMat);
+  keys.rotation.x = -Math.PI / 2; keys.position.set(0, H + 0.023, 0.19); ws.add(keys);
+  mesh(rbox(0.065, 0.026, 0.1, 0.012), M('#1a1f2b', { r:0.5 }), 0.34, H + 0.013, 0.2, ws);
+  // light spill from the screen onto the desk
+  const spillMat = new THREE.MeshBasicMaterial({ map:glowTex, color:tint, transparent:true, opacity:0.05, blending:THREE.AdditiveBlending, depthWrite:false });
+  const spill = new THREE.Mesh(G('spill', () => new THREE.PlaneGeometry(1.2, 0.8)), spillMat);
+  spill.rotation.x = -Math.PI / 2; spill.position.set(0, H + 0.004, 0.08); ws.add(spill);
+  // props
+  if (big) {
+    addProp('mug', ws, -0.85, 0.05, H, '#c9a24a'); addProp('clapper', ws, 0.82, -0.15, H, a.color);
+    addProp('plant', ws, -0.88, -0.3, H, a.color); addProp('tablet', ws, 0.62, 0.22, H, a.color);
+  } else {
+    const ps = PROPSETS[a.id] || ['mug'];
+    addProp(ps[0], ws, -0.52, -0.08, H, a.color);
+    if (ps[1]) addProp(ps[1], ws, 0.55, -0.22, H, ['#e8e4d8','#c9a24a','#36c5f0','#e8559a'][Math.floor(rng() * 4)]);
+  }
+  // seat (chair + NPC) facing the desk (-Z local)
+  const seat = new THREE.Group(); seat.position.set(0, 0, seatZ); seat.rotation.y = Math.PI; ws.add(seat);
+  seat.add(buildChair(new THREE.Color(a.color), big));
+  const F = buildFigure(a); seat.add(F.fig);
+  seat.traverse(o => { if (o.isMesh) { o.userData.agent = a; pickables.push(o); } });
+  // status ring + glow pool on the floor
+  const ringMat = new THREE.MeshBasicMaterial({ color:hdr(a.color, 1.4), transparent:true, opacity:0.1, blending:THREE.AdditiveBlending, depthWrite:false });
+  const ring = new THREE.Mesh(G('ring', () => new THREE.RingGeometry(0.56, 0.64, 56)), ringMat);
+  ring.rotation.x = -Math.PI / 2; ring.position.set(0, 0.012, seatZ); ws.add(ring);
+  const poolMat = new THREE.MeshBasicMaterial({ map:glowTex, color:new THREE.Color(a.color), transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false });
+  const pool = new THREE.Mesh(G('pool', () => new THREE.PlaneGeometry(1.5, 1.5)), poolMat);
+  pool.rotation.x = -Math.PI / 2; pool.position.set(0, 0.008, seatZ); ws.add(pool);
+  // floating name tag (HTML, always faces camera)
+  const wrap = document.createElement('div'); wrap.className = 'tagwrap';
+  wrap.innerHTML = `<div class="tag${a.robot ? ' mgr' : ''}" style="--c:${a.color}"><div class="n"><span class="dot"></span><span class="ic"></span>${a.name}</div><div class="r">${a.role}</div><div class="a"></div></div>`;
+  const label = new CSS2DObject(wrap);
+  label.position.set(0, big ? 1.95 : 1.82, seatZ);
+  ws.add(label);
+
+  Object.assign(a, {
+    ws, seat, F, screens, keysMat, spillMat, ringMat, poolMat, tint,
+    tagEl:wrap.firstElementChild, actEl:wrap.querySelector('.a'), tagIc:wrap.querySelector('.ic'), seatZ, big,
+    busy:false, state:'idle', task:'', updated:null, b:0, wL:0, wD:0, wK:0, glow:new THREE.Color(a.color),
+    hover:0, activity:'', timer:0, phase:Math.random() * 100,
+    gesture:null, gT:rand(4, 14), blinkT:rand(1, 5), flash:0,
+  });
+  return ws;
+}
+
+/* ===================== LAYOUT: pods + command desk ===================== */
+const COLW = 1.6;
+function rug(x, z, w, d, label, accent, border = '#c9a24a') {
+  const ch = Math.round(1024 * d / w);
+  const tex = canvasTex(1024, ch, (g, W, H) => {
+    g.fillStyle = '#0d1324'; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < 2500; i++) { g.fillStyle = `rgba(120,140,200,${rng() * 0.05})`; g.fillRect(rng() * W, rng() * H, 2, 2); }
+    g.strokeStyle = border; g.globalAlpha = 0.55; g.lineWidth = 7; g.strokeRect(16, 16, W - 32, H - 32);
+    g.globalAlpha = 0.22; g.lineWidth = 2; g.strokeRect(34, 34, W - 68, H - 68);
+    if (label) {
+      g.globalAlpha = 0.8; g.fillStyle = accent; g.textAlign = 'center';
+      g.font = '600 40px Helvetica,Arial,sans-serif'; g.fillText(label.split('').join(' '), W / 2, H - 58);
+    }
+    g.globalAlpha = 1;
+  });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ map:tex, roughness:0.95 }));
+  m.rotation.x = -Math.PI / 2; m.position.set(x, 0.004, z); m.receiveShadow = true; scene.add(m);
+}
+
+for (const p of PODS) {
+  const n = p.ids.length, cols = Math.ceil(n / 2);
+  const rowA = p.ids.slice(0, cols), rowB = p.ids.slice(cols);
+  const cx = i => p.x + (i - (cols - 1) / 2) * COLW;
+  rowA.forEach((id, i) => { const ws = buildWorkstation(byId[id]); ws.position.set(cx(i), 0, p.z - 0.4); ws.rotation.y = Math.PI; scene.add(ws); });
+  rowB.forEach((id, i) => { const ws = buildWorkstation(byId[id]); ws.position.set(cx(i), 0, p.z + 0.4); scene.add(ws); });
+  if (rowB.length < cols) {   // filler: cabinet + printer + small plant
+    const fx = cx(cols - 1), fz = p.z + 0.45;
+    const g = new THREE.Group(); g.position.set(fx, 0, fz); scene.add(g);
+    mesh(rbox(0.9, 0.7, 0.6, 0.02), M('#161c2c', { r:0.5, m:0.3 }), 0, 0.35, 0, g);
+    for (let i = 0; i < 3; i++) mesh(box(0.8, 0.005, 0.01), goldMetal, 0, 0.18 + i * 0.2, 0.301, g, false);
+    mesh(rbox(0.5, 0.22, 0.4, 0.03), M('#d8dbe4', { r:0.5 }), -0.1, 0.81, 0, g);
+    mesh(box(0.3, 0.004, 0.2), M('#ffffff', { r:0.9 }), -0.1, 0.925, 0.05, g, false);
+    addPlant(fx + 0.3, fz, 0.4).position.y = 0.7;
+  }
+  const span = cols * COLW;
+  mesh(box(span - 0.1, 0.44, 0.03), M('#22314f', { r:0.2, m:0.1, t:true, o:0.45 }), p.x, 0.96, p.z, scene, false);
+  mesh(box(span - 0.1, 0.015, 0.045), goldDim, p.x, 1.185, p.z, scene, false);
+  rug(p.x, p.z, span + 1.5, 3.9, p.name, '#e6c477');
+  pendantBar(p.x, p.z, Math.max(1.4, span - 0.2));
+}
+{
+  const ws = buildWorkstation(byId.grok, true);
+  ws.position.set(0, 0, 3.0); ws.rotation.y = Math.PI; ws.scale.setScalar(1.12); scene.add(ws);
+  rug(0, 2.6, 4.2, 3.4, 'STUDIO COMMAND', '#ffd77a', '#ffd77a');
+  pendantRing(0, 2.4);
+}
+
+/* ===================== SET DRESSING ===================== */
+// holo story table (center of the floor)
+const holo = new THREE.Group(); holo.position.set(0, 0, -0.75); scene.add(holo);
+{
+  mesh(cyl(0.18, 0.28, 0.72, 24), darkMetal, 0, 0.36, 0, holo);
+  mesh(cyl(0.8, 0.8, 0.05, 48), M('#0d1220', { r:0.2, m:0.6 }), 0, 0.745, 0, holo);
+  const rim = mesh(new THREE.TorusGeometry(0.8, 0.018, 8, 64), goldLED, 0, 0.77, 0, holo, false); rim.rotation.x = Math.PI / 2;
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(0.42, 40), new THREE.MeshBasicMaterial({ color:hdr(0x5fd4ff, 0.6), transparent:true, opacity:0.4, blending:THREE.AdditiveBlending, depthWrite:false }));
+  disc.rotation.x = -Math.PI / 2; disc.position.y = 0.776; holo.add(disc);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.36, 0.9, 32, 1, true),
+    new THREE.MeshBasicMaterial({ color:0x4cc8ff, transparent:true, opacity:0.05, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false }));
+  beam.position.y = 1.22; holo.add(beam);
+  const spin = new THREE.Group(); spin.position.y = 1.5; holo.add(spin); holo.userData.spin = spin;
+  spin.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.34, 1), new THREE.MeshBasicMaterial({ color:hdr(0xffc857, 0.8), wireframe:true, transparent:true, opacity:0.4, blending:THREE.AdditiveBlending, depthWrite:false })));
+  const reel = new THREE.Group(); spin.add(reel); holo.userData.reel = reel;
+  const rm = new THREE.MeshBasicMaterial({ color:hdr(0x7fe3ff, 0.9), transparent:true, opacity:0.7, blending:THREE.AdditiveBlending, depthWrite:false });
+  reel.add(new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.012, 8, 40), rm));
+  for (let i = 0; i < 5; i++) { const an = i / 5 * Math.PI * 2; const h = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.008, 6, 16), rm); h.position.set(Math.cos(an) * 0.1, Math.sin(an) * 0.1, 0); reel.add(h); }
+  for (let i = 0; i < 3; i++) {
+    const an = Math.PI * 0.25 + i * Math.PI * 0.75;
+    const s = new THREE.Group(); s.position.set(Math.cos(an) * 1.25, 0, Math.sin(an) * 1.25); holo.add(s);
+    mesh(cyl(0.025, 0.025, 0.6, 8), darkMetal, 0, 0.3, 0, s); mesh(cyl(0.18, 0.2, 0.05, 20), darkMetal, 0, 0.025, 0, s);
+    mesh(cyl(0.2, 0.2, 0.07, 20), M('#2a2215', { r:0.8 }), 0, 0.63, 0, s);
+  }
+}
+
+// lounge (front-left)
+{
+  const g = new THREE.Group(); g.position.set(-10.4, 0, 6.4); scene.add(g);
+  const vel = M('#1c2a48', { r:0.95 });
+  mesh(rbox(0.95, 0.42, 2.6, 0.08), vel, 0, 0.21, 0, g);
+  mesh(rbox(0.28, 0.55, 2.6, 0.08), vel, -0.38, 0.6, 0, g);
+  for (const s of [-1, 1]) mesh(rbox(0.95, 0.6, 0.22, 0.08), vel, 0, 0.3, s * 1.3, g);
+  for (const s of [-0.6, 0.6]) mesh(rbox(0.22, 0.32, 0.32, 0.08), M('#c9a24a', { r:0.8 }), -0.2, 0.55, s, g);
+  const t = new THREE.Group(); t.position.set(1.25, 0, 0); g.add(t);
+  mesh(cyl(0.5, 0.5, 0.04, 32), M('#221a10', { r:0.25, m:0.3 }), 0, 0.42, 0, t);
+  mesh(cyl(0.05, 0.12, 0.4, 12), goldMetal, 0, 0.2, 0, t);
+  addProp('mug', t, -0.15, 0.1, 0.44, '#e8e4d8'); addProp('books', t, 0.1, -0.15, 0.44, '#c9a24a');
+  const l = new THREE.Group(); l.position.set(-0.2, 0, -1.75); g.add(l);
+  mesh(cyl(0.18, 0.2, 0.04, 20), darkMetal, 0, 0.02, 0, l);
+  mesh(cyl(0.015, 0.015, 1.9, 8), goldMetal, 0, 0.95, 0, l);
+  const arc = mesh(new THREE.TorusGeometry(0.6, 0.015, 6, 32, Math.PI), goldMetal, 0.6, 1.9, 0, l, false);
+  mesh(new THREE.SphereGeometry(0.2, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), M('#c9a24a', { r:0.3, m:0.8, side:THREE.DoubleSide }), 1.2, 1.72, 0, l);
+  mesh(sph(0.08, 12, 10), new THREE.MeshStandardMaterial({ color:0x221800, emissive:0xffc070, emissiveIntensity:4 }), 1.2, 1.74, 0, l, false);
+  const LL = new THREE.PointLight(0xffb866, 4, 5, 1.8); LL.position.set(1.2, 1.5, 0); l.add(LL);
+  rug(-9.6, 6.4, 3.4, 3.6, '', '#c9a24a');
+}
+
+// coffee bar + water cooler (front-right)
+{
+  const g = new THREE.Group(); g.position.set(11.35, 0, 6.3); scene.add(g);
+  mesh(rbox(0.75, 1.0, 3.0, 0.03), M('#1a140c', { r:0.4, m:0.2 }), 0, 0.5, 0, g);
+  mesh(box(0.8, 0.04, 3.05), M('#2b2f3a', { r:0.25, m:0.5 }), 0, 1.02, 0, g);
+  mesh(box(0.01, 0.03, 3.0), goldLED, -0.38, 0.95, 0, g, false);
+  const cm = new THREE.Group(); cm.position.set(0.05, 1.04, -0.6); g.add(cm);
+  mesh(rbox(0.4, 0.45, 0.35, 0.04), M('#b9bec9', { r:0.25, m:0.85 }), 0, 0.225, 0, cm);
+  mesh(sph(0.025, 8, 8), new THREE.MeshStandardMaterial({ color:0x002211, emissive:0x36ff9a, emissiveIntensity:3 }), -0.2, 0.33, 0.1, cm, false);
+  for (let i = 0; i < 4; i++) addProp('mug', g, -0.1, 0.1 + i * 0.16, 1.04, ['#e8e4d8','#c9a24a','#1c2a48','#e8559a'][i]);
+  const wc = new THREE.Group(); wc.position.set(11.4, 0, 3.9); scene.add(wc);
+  mesh(rbox(0.36, 0.95, 0.36, 0.03), M('#d8dbe4', { r:0.5 }), 0, 0.475, 0, wc);
+  mesh(cyl(0.15, 0.15, 0.42, 20), M('#5fb8ff', { r:0.1, t:true, o:0.55 }), 0, 1.16, 0, wc);
+}
+
+addPlant(-11.3, -8.3, 1.1); addPlant(11.3, -8.3, 1.1); addPlant(-11.3, 8.3, 0.9);
+addPlant(-2.2, 3.6, 0.75); addPlant(2.2, 3.6, 0.75);
+
+// cinema camera on a tripod + softbox near the Visual Lab
+{
+  const c = new THREE.Group(); c.position.set(10.4, 0, -6.6); c.rotation.y = -Math.PI / 2 - 0.4; scene.add(c);
+  for (let i = 0; i < 3; i++) {
+    const an = i / 3 * Math.PI * 2;
+    const leg = mesh(cyl(0.015, 0.02, 1.45, 6), darkMetal, Math.cos(an) * 0.25, 0.68, Math.sin(an) * 0.25, c);
+    leg.rotation.set(Math.sin(an) * 0.2, 0, -Math.cos(an) * 0.2);
+  }
+  mesh(cyl(0.05, 0.05, 0.1, 12), darkMetal, 0, 1.38, 0, c);
+  mesh(rbox(0.22, 0.24, 0.42, 0.03), blackPlastic, 0, 1.55, 0, c);
+  mesh(cyl(0.08, 0.09, 0.24, 20), M('#111111', { r:0.3, m:0.6 }), 0, 1.55, 0.32, c).rotation.x = Math.PI / 2;
+  mesh(cyl(0.075, 0.075, 0.01, 20), M('#2a4b7a', { r:0.05, m:0.9 }), 0, 1.55, 0.445, c).rotation.x = Math.PI / 2;
+  mesh(sph(0.018, 8, 8), new THREE.MeshStandardMaterial({ color:0x220000, emissive:0xff2a2a, emissiveIntensity:4 }), 0.08, 1.7, 0.1, c, false);
+  for (const s of [-1, 1]) mesh(cyl(0.11, 0.11, 0.03, 20), blackPlastic, 0, 1.78, s * 0.12, c).rotation.z = Math.PI / 2;
+  const sb = new THREE.Group(); sb.position.set(10.6, 0, -2.4); sb.rotation.y = -Math.PI / 2 - 0.6; scene.add(sb);
+  mesh(cyl(0.015, 0.015, 1.9, 6), darkMetal, 0, 0.95, 0, sb);
+  mesh(cyl(0.22, 0.25, 0.03, 16), darkMetal, 0, 0.015, 0, sb);
+  mesh(box(0.8, 0.6, 0.25), blackPlastic, 0, 1.95, -0.05, sb);
+  mesh(box(0.74, 0.54, 0.01), new THREE.MeshStandardMaterial({ color:0x222222, emissive:0xfff1d6, emissiveIntensity:1.6 }), 0, 1.95, 0.08, sb, false);
+}
+
+// floor emblem (front, center)
+{
+  const tex = canvasTex(512, 512, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(245,196,81,.55)'; g.lineWidth = 6; g.beginPath(); g.arc(w / 2, h / 2, 240, 0, Math.PI * 2); g.stroke();
+    g.lineWidth = 2; g.beginPath(); g.arc(w / 2, h / 2, 222, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = 'rgba(245,196,81,.75)'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = 'bold 150px Georgia,serif'; g.fillText('V', w / 2, h / 2 - 10);
+    g.font = '600 26px Helvetica,Arial,sans-serif'; g.fillText('A I   S T U D I O', w / 2, h / 2 + 105);
+  });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshStandardMaterial({ map:tex, transparent:true, roughness:0.4, metalness:0.4, depthWrite:false }));
+  m.rotation.x = -Math.PI / 2; m.position.set(0, 0.006, 6.6); scene.add(m);
+}
+
+/* ===================== PIPELINE BOARD (redrawn on state change) ===================== */
+function drawBoard() {
+  const { g, canvas } = boardTex.userData; const w = canvas.width, h = canvas.height;
+  const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#0a1124'); gr.addColorStop(1, '#05070f');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.textBaseline = 'alphabetic';
+  g.fillStyle = '#f5c451'; g.font = '700 40px Helvetica,Arial,sans-serif'; g.textAlign = 'left';
+  g.fillText('STUDIO PIPELINE', 48, 72);
+  const n = AGENTS.filter(a => a.busy).length;
+  const ms = live.mode === 'demo' ? ['#ffb547', 'DEMO'] : live.ok ? ['#36ff9a', 'LIVE'] : live.ok === false ? ['#ff4d5e', 'OFFLINE'] : ['#6b7389', 'CONNECTING'];
+  g.fillStyle = ms[0]; g.beginPath(); g.arc(436, 58, 9, 0, Math.PI * 2); g.fill();
+  g.font = '600 22px Helvetica,Arial,sans-serif'; g.fillText(ms[1], 454, 66);
+  g.textAlign = 'right'; g.fillStyle = '#ffe08a'; g.font = '700 64px Helvetica,Arial,sans-serif'; g.fillText(`${n}`, w - 210, 80);
+  g.fillStyle = '#8b93a8'; g.font = '500 26px Helvetica,Arial,sans-serif'; g.fillText('/ 16 active', w - 48, 78);
+  g.fillStyle = 'rgba(245,196,81,.25)'; g.fillRect(48, 100, w - 96, 2);
+  const order = ['grok','reed','iris','nova','ivy','atlas','vera','lens','pix','frame','reel','vox','cut','judge','press','pulse'];
+  order.forEach((id, i) => {
+    const a = byId[id]; const col = i < 8 ? 0 : 1, row = i % 8;
+    const cw = (w - 96) / 2 - 12, x = 48 + col * (cw + 24), y = 122 + row * 72;
+    const st = STATES[a.state] || STATES.idle, on = a.state !== 'idle';
+    g.fillStyle = on ? 'rgba(255,255,255,.07)' : 'rgba(255,255,255,.025)'; g.fillRect(x, y, cw, 60);
+    g.fillStyle = a.color; g.fillRect(x, y, 6, 60);
+    g.textAlign = 'left'; g.fillStyle = '#eef1f8'; g.font = '700 24px Helvetica,Arial,sans-serif'; g.fillText(a.name, x + 22, y + 27);
+    g.fillStyle = '#8b93a8'; g.font = '500 16px Helvetica,Arial,sans-serif'; g.fillText(a.role.toUpperCase(), x + 22, y + 49);
+    g.fillStyle = on ? st.col : '#4d556a'; g.font = '700 14px Helvetica,Arial,sans-serif'; g.fillText(st.label.toUpperCase(), x + 22 + g.measureText(a.role.toUpperCase()).width * 1.18 + 14, y + 49);
+    g.textAlign = 'right';
+    const txt = a.task || (on ? '' : 'IDLE');
+    g.fillStyle = on ? st.col : '#59617a'; g.font = '600 18px Helvetica,Arial,sans-serif';
+    let act = txt; while (g.measureText(act + '…').width > cw - 190 && act.length > 4) act = act.slice(0, -1);
+    g.fillText(act === txt ? act : act + '…', x + cw - 16, y + 37);
+  });
+  boardTex.needsUpdate = true;
+}
+
+/* ===================== UI: roster, feed, tooltip ===================== */
+const $ = id => document.getElementById(id);
+const listEl = $('list'), tip = $('tip');
+let hovered = null;
+AGENTS.forEach(a => {
+  const li = document.createElement('li'); li.style.setProperty('--c', a.color);
+  li.innerHTML = `<span class="sw" style="background:${a.color}"></span><div class="li-main"><b>${a.name}</b> <i>· ${a.role}</i><small>Idle</small></div><span class="st">idle</span>`;
+  li.addEventListener('click', () => focusAgent(a));
+  li.addEventListener('mouseenter', () => setHover(a, true));
+  li.addEventListener('mouseleave', () => setHover(null));
+  listEl.appendChild(li); a.li = li; a.liAct = li.querySelector('small'); a.liSt = li.querySelector('.st');
+});
+const timeStr = () => new Date().toTimeString().slice(0, 5);
+function feed(text, color = '#f5c451') {
+  const li = document.createElement('li');
+  li.innerHTML = `<time>${timeStr()}</time><span class="d" style="background:${color}"></span><span>${text}</span>`;
+  const fl = $('feedList'); fl.prepend(li);
+  while (fl.children.length > 8) fl.lastChild.remove();
+}
+let boardDirty = true;
+function refreshAgent(a) {
+  const st = STATES[a.state] || STATES.idle, on = a.state !== 'idle';
+  a.tagEl.classList.toggle('busy', on);
+  a.tagEl.style.setProperty('--c', st.col);
+  a.tagIc.innerHTML = on ? ICONS[a.state] : '';
+  a.actEl.textContent = a.task || st.label;
+  a.li.className = (on ? 'busy ' : '') + 'st-' + a.state + (hovered === a ? ' hot' : '');
+  a.li.style.setProperty('--c', st.col);
+  a.liAct.textContent = a.task || (on ? st.label : 'Idle');
+  a.li.title = `${a.name} · ${st.label}${a.task ? ' — ' + a.task : ''}${a.updated ? '\nupdated ' + fmtTime(a.updated, true) : ''}`;
+  a.liSt.innerHTML = (on ? ICONS[a.state] : '') + st.label;
+  const c = {}; AGENTS.forEach(x => { c[x.state] = (c[x.state] || 0) + 1; });
+  const n = AGENTS.filter(x => x.busy).length;
+  const kinds = ['working', 'learning', 'leads', 'blocked'].filter(k => c[k]);
+  $('workN').textContent = n;
+  $('rosterCount').textContent = !kinds.length ? 'all idle' : kinds.length <= 2 ? kinds.map(k => `${c[k]} ${k}`).join(' · ') : `${n} active${c.blocked ? ` · ${c.blocked} blocked` : ''}`;
+  boardDirty = true;
+  if (hovered === a && tip.classList.contains('show')) showTip(a);
+}
+function showTip(a) {
+  const st = STATES[a.state] || STATES.idle, on = a.state !== 'idle';
+  tip.style.setProperty('--c', st.col);
+  tip.innerHTML = `<div class="t1"><span class="sw" style="background:${a.color}"></span>${a.name}<span class="pill ${on ? 'busy' : ''}">${on ? ICONS[a.state] : ''}${st.label}</span></div>
+    <div class="t2">${a.role} · ${a.pod}</div><div class="t3">${esc(a.task || (on ? st.label : 'Idle'))}</div>
+    <div class="t2" style="margin-top:6px">${live.mode === 'demo' ? 'Demo mode — simulated' : a.updated ? 'Updated ' + fmtTime(a.updated, true) + ' · ' + ago(a.updated) : live.ok === false ? 'Live status unavailable' : ''}</div>`;
+  tip.classList.add('show');
+}
+function setHover(a, fromList = false) {
+  if (hovered === a) return;
+  if (hovered) { hovered.tagEl.classList.remove('hot'); hovered.li.classList.remove('hot'); }
+  hovered = a;
+  if (a) { a.tagEl.classList.add('hot'); a.li.classList.add('hot'); if (!fromList) showTip(a); else tip.classList.remove('show'); }
+  else tip.classList.remove('show');
+  renderer.domElement.classList.toggle('hovering', !!a && !fromList);
+}
+
+/* ===================== LIVE STATUS (status/status.json, polled every 5 s) ===================== */
+const STATES = {
+  working:  { label:'working',  col:'#3ddc84' },
+  learning: { label:'learning', col:'#4fa8ff' },
+  leads:    { label:'leads',    col:'#b47cff' },
+  blocked:  { label:'blocked',  col:'#ff4d5e' },
+  idle:     { label:'idle',     col:'#6b7389' },
+};
+const svg = d => `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const ICONS = {
+  working:  svg('<rect x="1.2" y="4" width="13.6" height="8.2" rx="1.6"/><path d="M4 7h.5M7 7h.5M10 7h.5M5 9.8h6"/>'),
+  learning: svg('<path d="M8 4.2C6.4 3 4 2.7 1.4 3.1v9.2c2.6-.4 5 0 6.6 1.1 1.6-1.1 4-1.5 6.6-1.1V3.1C12 2.7 9.6 3 8 4.2zM8 4.2v9.2"/>'),
+  leads:    svg('<circle cx="6.6" cy="6.6" r="4.4"/><path d="M9.9 9.9L14.3 14.3" stroke-width="2.1"/>'),
+  blocked:  svg('<circle cx="8" cy="8" r="6.2"/><path d="M3.7 12.3l8.6-8.6"/>'),
+  idle:     '',
+};
+const POLL_MS = 60000;
+const live = { mode:'live', ok:null, status:null, entries:null, at:null, err:'', feedSig:'' };
+const esc = v => String(v ?? '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+function fmtTime(iso, full = false) {
+  const d = new Date(iso); if (isNaN(d)) return '';
+  const hm = d.toTimeString().slice(0, 5);
+  return full ? d.toLocaleDateString([], { month:'short', day:'numeric' }) + ' ' + d.toTimeString().slice(0, 8) : hm;
+}
+function ago(iso) {
+  const s = (Date.now() - new Date(iso)) / 1000; if (isNaN(s)) return '';
+  return s < 60 ? 'just now' : s < 3600 ? `${Math.round(s / 60)}m ago` : s < 86400 ? `${Math.round(s / 3600)}h ago` : `${Math.round(s / 86400)}d ago`;
+}
+function setState(a, state, task, updated) {
+  if (!STATES[state]) state = 'idle';
+  const prev = a.state;
+  a.state = state; a.task = task || ''; a.updated = updated || null;
+  a.busy = state === 'working' || state === 'learning' || state === 'leads';
+  a.activity = a.task;
+  if (state !== 'idle') a.gesture = null;
+  if (prev !== state && state !== 'idle') a.flash = 1;
+  refreshAgent(a);
+}
+// jump straight to the target pose/glow (first load, mode switches) instead of fading in from idle
+function snapPose(a) {
+  a.b = a.state === 'working' ? 1 : 0; a.wL = a.state === 'learning' ? 1 : 0;
+  a.wD = a.state === 'leads' ? 1 : 0;  a.wK = a.state === 'blocked' ? 1 : 0;
+  a.glow.set(a.state === 'working' || a.state === 'idle' ? a.color : STATES[a.state].col);
+  a.flash = 0;
+}
+function snapAll() { AGENTS.forEach(snapPose); boardDirty = true; boardTimer = 0; tick(); }   // render one frame now
+function setLiveUI() {
+  const el = $('live'), tx = $('liveTxt'), off = $('offline');
+  el.className = 'live ' + (live.mode === 'demo' ? 'demo' : live.ok ? 'ok' : live.ok === false ? 'off' : '');
+  if (live.mode === 'demo') tx.innerHTML = '<b>DEMO</b> · simulated activity, not real status';
+  else if (live.ok) tx.innerHTML = `<b>LIVE</b> · status.json · checked ${live.at.toTimeString().slice(0, 8)}`;
+  else if (live.ok === false) tx.innerHTML = '<b>OFFLINE</b> · Live status unavailable — will retry shortly';
+  else tx.innerHTML = '<b>CONNECTING</b> · reading status/status.json…';
+  const showOff = live.mode === 'live' && live.ok === false;
+  document.body.classList.toggle('is-off', showOff);
+  off.innerHTML = 'Live status unavailable — will retry shortly' +
+    (location.protocol === 'file:' ? '<br><small>Run <code>python3 -m http.server 8767</code> in the studio folder, then open <code>http://127.0.0.1:8767/virtual-office-3d.html</code></small>'
+                                   : `<br><small>${esc(live.err)}</small>`);
+  const b = $('btnSim'); b.classList.toggle('primary', live.mode === 'demo'); b.classList.toggle('on', live.mode === 'demo');
+  b.textContent = live.mode === 'demo' ? 'Stop demo · back to LIVE' : 'Simulate busy';
+  b.title = live.mode === 'demo' ? '' : 'Optional demo: fake activity until you stop it';
+  boardDirty = true;
+}
+function renderFeed(entries) {
+  const sig = JSON.stringify(entries);
+  if (sig === live.feedSig) return;
+  live.feedSig = sig;
+  const fl = $('feedList'); fl.innerHTML = '';
+  if (!entries.length) { feed('No activity logged yet', '#8b93a8'); return; }
+  for (const e of entries.slice(-8).reverse()) {
+    const a = byId[e.agent], st = STATES[e.state] || STATES.idle;
+    const li = document.createElement('li'); li.title = e.ts || '';
+    li.innerHTML = `<time>${esc(fmtTime(e.ts) || '--:--')}</time><span class="d" style="background:${st.col}"></span>` +
+      `<span><b style="color:${a ? a.color : '#ccc'}">${esc(a ? a.name : e.agent)}</b> <span class="s" style="color:${st.col}">${ICONS[e.state] || ''}${esc(st.label)}</span>` +
+      `${e.task ? ' · ' + esc(e.task) : ''}</span>`;
+    fl.appendChild(li);
+  }
+}
+function applyLive() {
+  if (live.mode !== 'live') return;
+  if (!live.ok) {                       // never fake activity: everyone idle, say why
+    AGENTS.forEach(a => setState(a, 'idle', '', null));
+    live.feedSig = '';
+    $('feedList').innerHTML = '';
+    feed('Live status unavailable — will retry shortly', '#ff4d5e');
+    return;
+  }
+  const S = live.status.agents || live.status;
+  for (const a of AGENTS) {
+    const e = S[a.id];
+    if (e && typeof e === 'object') setState(a, String(e.state || 'idle').toLowerCase(), e.task, e.updated);
+    else setState(a, 'idle', 'No status reported', null);
+  }
+  // feed = tail of activity.log; if that isn't readable, the newest status.json entries (both real data)
+  const entries = live.entries || AGENTS.filter(a => a.updated).map(a => ({ ts:a.updated, agent:a.id, state:a.state, task:a.task }))
+    .sort((x, y) => new Date(x.ts) - new Date(y.ts));
+  renderFeed(entries.slice(-8));
+}
+async function getUrl(url, asJson = true) {
+  const r = await fetch(`${url}?t=${Date.now()}`, { cache:'no-store' });
+  if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`);
+  return asJson ? r.json() : r.text();
+}
+let polling = false;
+async function poll() {
+  if (polling) return; polling = true;
+  try {
+    let status;
+    try {
+      status = await getUrl('status/status.json');
+      if (!status || typeof status !== 'object') throw new Error('status.json is not an object');
+    } catch (e) {
+      const was = live.ok;
+      live.ok = false; live.err = e.message || String(e); live.status = null; live.at = new Date();
+      if (was !== false) applyLive();
+      setLiveUI();
+      if (was !== false && live.mode === 'live') snapAll();
+      return;
+    }
+    let entries = null;
+    try { const j = await getUrl('status/activity.json'); entries = Array.isArray(j) ? j : j.entries; }
+    catch {
+      try {
+        entries = (await getUrl('status/activity.log', false)).trim().split('\n').filter(Boolean).slice(-8)
+          .map(l => { const p = l.split('\t'); return { ts:p[0], agent:p[1], state:p[2], task:p[3] || '' }; });
+      } catch { entries = null; }
+    }
+    const first = live.ok !== true;
+    live.ok = true; live.err = ''; live.status = status; live.entries = Array.isArray(entries) ? entries.slice(-8) : null; live.at = new Date();
+    applyLive();
+    setLiveUI();
+    if (first && live.mode === 'live') snapAll();
+  } finally { polling = false; }
+}
+
+/* ===================== DEMO SIMULATION (optional, off by default) ===================== */
+const sim = { running:false };
+function setBusy(a, on, activity) {
+  const r = Math.random();
+  setState(a, on ? (activity ? 'working' : r < 0.7 ? 'working' : r < 0.85 ? 'learning' : 'leads') : 'idle', on ? (activity || pick(a.acts)) : '', null);
+  a.timer = on ? rand(5, 11) : rand(2, 6);
+}
+function startSim() {
+  live.mode = 'demo'; sim.running = true; live.feedSig = '';
+  AGENTS.forEach(a => setState(a, 'idle', '', null));
+  $('feedList').innerHTML = '';
+  const idle = AGENTS.filter(a => a.id !== 'grok').sort(() => Math.random() - 0.5);
+  const n = 8 + Math.floor(Math.random() * 4);
+  setBusy(byId.grok, true, 'Dispatching today’s briefs');
+  idle.slice(0, n).forEach(a => setBusy(a, true));
+  feed(`DEMO started — simulated activity (not real) · ${AGENTS.filter(a => a.busy).length} agents`, '#ffb547');
+  setLiveUI();
+  snapAll();
+}
+function stopDemo() {
+  sim.running = false; live.mode = 'live'; live.feedSig = '';
+  orbs.splice(0).forEach(o => scene.remove(o.group));
+  AGENTS.forEach(a => setState(a, 'idle', '', null));   // drop the fake states right away
+  $('feedList').innerHTML = ''; feed('Demo stopped — back to LIVE status', '#8b93a8');
+  live.ok = null;                     // next poll result is treated as a fresh load (re-applies + snaps pose)
+  setLiveUI();
+  poll();
+}
+function updateSim(dt) {
+  if (!sim.running || live.mode !== 'demo') return;
+  const working = AGENTS.filter(a => a.busy).length;
+  for (const a of AGENTS) {
+    a.timer -= dt;
+    if (a.timer > 0) continue;
+    if (a.busy) {
+      const done = a.activity;
+      setBusy(a, false);
+      let targets = NEXT[a.id];
+      if (a.id === 'grok') targets = AGENTS.filter(x => !x.busy && x.id !== 'grok').map(x => x.id);
+      if (targets.length && Math.random() < 0.75) {
+        const to = byId[pick(targets)];
+        sendOrb(a, to);
+        feed(`<b style="color:${a.color}">${a.name}</b> → <b style="color:${to.color}">${to.name}</b> · ${a.id === 'grok' ? 'new brief' : done.toLowerCase()}`, a.color);
+      } else feed(`<b style="color:${a.color}">${a.name}</b> finished: ${done.toLowerCase()}`, a.color);
+    } else {
+      const p = working > 12 ? 0.25 : working < 6 ? 0.8 : 0.5;
+      if (Math.random() < p) setBusy(a, true); else a.timer = rand(2, 5);
+    }
+  }
+}
+
+// hand-off orbs flying between desks
+const orbs = [];
+const orbGeo = new THREE.SphereGeometry(0.07, 14, 10);
+const agentAnchor = a => a.ws.localToWorld(new THREE.Vector3(0, 1.3, a.seatZ * 0.4));
+function sendOrb(from, to) {
+  const group = new THREE.Group(); scene.add(group);
+  const core = new THREE.Mesh(orbGeo, new THREE.MeshBasicMaterial({ color:hdr(from.color, 3) })); group.add(core);
+  const trail = [];
+  for (let i = 0; i < 10; i++) {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, color:new THREE.Color(from.color), transparent:true,
+      opacity:0.65 * (1 - i / 10), blending:THREE.AdditiveBlending, depthWrite:false }));
+    s.scale.setScalar(0.55 * (1 - i / 12)); group.add(s); trail.push(s);
+  }
+  const p0 = agentAnchor(from), p2 = agentAnchor(to);
+  const p1 = p0.clone().lerp(p2, 0.5); p1.y = 3.0 + p0.distanceTo(p2) * 0.06;
+  orbs.push({ group, core, trail, p0, p1, p2, k:0, dur:1.2 + p0.distanceTo(p2) * 0.06, to, from });
+}
+const _bz = new THREE.Vector3();
+function bez(o, k) { const u = 1 - k; return _bz.set(0, 0, 0).addScaledVector(o.p0, u * u).addScaledVector(o.p1, 2 * u * k).addScaledVector(o.p2, k * k); }
+function updateOrbs(dt) {
+  for (let i = orbs.length - 1; i >= 0; i--) {
+    const o = orbs[i]; o.k += dt / o.dur;
+    const k = Math.min(1, o.k), e = k * k * (3 - 2 * k);
+    o.core.position.copy(bez(o, e));
+    o.trail.forEach((s, j) => s.position.copy(bez(o, Math.max(0, e - j * 0.022))));
+    if (o.k >= 1) {
+      scene.remove(o.group); orbs.splice(i, 1);
+      o.to.flash = 1;
+      if (sim.running && live.mode === 'demo' && !o.to.busy) setBusy(o.to, true);
+    }
+  }
+}
+
+/* ===================== NPC ANIMATION ===================== */
+const _red = new THREE.Color('#ff4d5e'), _tc = new THREE.Color(), _gc = new THREE.Color();
+function animateAgent(a, dt, t) {
+  const k4 = Math.min(1, dt * 4);
+  a.b  += ((a.state === 'working'  ? 1 : 0) - a.b)  * k4;   // typing
+  a.wL += ((a.state === 'learning' ? 1 : 0) - a.wL) * k4;   // reading a book
+  a.wD += ((a.state === 'leads'    ? 1 : 0) - a.wD) * k4;   // magnifier, scanning
+  a.wK += ((a.state === 'blocked'  ? 1 : 0) - a.wK) * k4;   // head in hands
+  a.hover += ((hovered === a ? 1 : 0) - a.hover) * Math.min(1, dt * 8);
+  const b = a.b, wL = a.wL, wD = a.wD, wK = a.wK, q = Math.max(0, 1 - b - wL - wD - wK), T = t + a.phase, F = a.F;
+  const act = clamp(b + wL * 0.8 + wD * 0.9 + wK * (0.55 + Math.sin(T * 4) * 0.35), 0, 1.3);
+
+  // idle gestures: stretch, or glance at a neighbour
+  if (a.state === 'idle') {
+    a.gT -= dt;
+    if (!a.gesture && a.gT <= 0) a.gesture = { type:Math.random() < 0.45 ? 'stretch' : 'look', k:0, dir:Math.random() < 0.5 ? -1 : 1 };
+  }
+  let gw = 0;
+  if (a.gesture) {
+    a.gesture.k += dt / (a.gesture.type === 'stretch' ? 2.6 : 3.2);
+    gw = Math.sin(Math.min(1, a.gesture.k) * Math.PI) * q;
+    if (a.gesture.k >= 1) { a.gesture = null; a.gT = rand(6, 16); }
+  }
+  const stretch = a.gesture?.type === 'stretch' ? gw : 0;
+  const look = a.gesture?.type === 'look' ? gw * a.gesture.dir : 0;
+
+  const pageTurn = Math.pow(Math.max(0, Math.sin(T * 0.9)), 12);
+  F.body.position.y = 0.6 + Math.sin(T * 1.6) * 0.008 * (q + wL + wK) + Math.abs(Math.sin(T * 9)) * 0.012 * b;
+  F.body.rotation.x = q * Math.sin(T * 0.7) * 0.02 + b * (0.1 + Math.sin(T * 2.2) * 0.015) + wL * (0.12 + Math.sin(T * 0.8) * 0.01)
+                    + wD * (0.2 + Math.sin(T * 0.9) * 0.03) + wK * 0.16 - stretch * 0.14;
+  F.body.rotation.z = Math.sin(T * 0.5) * 0.02 * q + wD * Math.sin(T * 0.55) * 0.05;
+  F.head.rotation.y = q * (Math.sin(T * 0.45) * 0.3 + look * 0.9) + b * Math.sin(T * 1.3) * 0.06 + wL * Math.sin(T * 0.25) * 0.08
+                    + wD * Math.sin(T * 1.1) * 0.5 + wK * Math.sin(T * 0.7) * 0.18;
+  F.head.rotation.x = q * (Math.sin(T * 0.6) * 0.05 - stretch * 0.3) + b * (0.13 + Math.sin(T * 7) * 0.015) + wL * (0.42 + Math.sin(T * 0.4) * 0.03)
+                    + wD * (0.22 + Math.sin(T * 0.8) * 0.08) + wK * 0.42;
+
+  for (const arm of F.arms) {
+    const s = arm.s, right = s > 0;
+    const idleU = -0.3 + Math.sin(T * 0.8 + s) * 0.03, idleE = -1.0;
+    const busyU = -0.5, busyE = -1.15 + Math.sin(T * 17 + s * 1.9) * 0.17 + Math.sin(T * 5.3 + s) * 0.05;
+    const lU = -0.78 + Math.sin(T * 0.6 + s) * 0.02 - (right ? pageTurn * 0.25 : 0), lE = -1.15 - (right ? pageTurn * 0.35 : 0), lZ = -s * 0.3;
+    const dU = right ? -1.3 + Math.sin(T * 1.1) * 0.1 : -0.45, dE = right ? -0.95 + Math.sin(T * 0.8) * 0.08 : -1.05, dZ = right ? -0.22 : s * 0.06;
+    const kU = -1.0, kE = -2.0, kZ = -s * 0.32;
+    const z0 = s * 0.06;
+    arm.sh.rotation.x = lerp(q * idleU + b * busyU + wL * lU + wD * dU + wK * kU, -2.9, stretch);
+    arm.sh.rotation.z = lerp(z0 * (q + b) + wL * lZ + wD * dZ + wK * kZ, s * 0.28, stretch);
+    arm.el.rotation.x = lerp(q * idleE + b * busyE + wL * lE + wD * dE + wK * kE, -0.25, stretch);
+  }
+  F.book.visible = wL > 0.02; F.book.scale.setScalar(Math.max(0.001, wL * 1.35));
+  F.mag.visible = wD > 0.02; F.mag.scale.setScalar(Math.max(0.001, wD * 1.3));
+  a.seat.rotation.y = Math.PI + (Math.sin(T * 0.35) * 0.14 + Math.sin(T * 0.9) * 0.04) * q;
+
+  a.blinkT -= dt;
+  const blink = a.blinkT < 0.12 ? 0.12 : 1;
+  if (a.blinkT < 0) a.blinkT = rand(2, 6);
+  if (F.eyes) F.eyes.scale.y = blink;
+  if (F.visor) { F.visor.scale.y = blink; F.visorMat.emissiveIntensity = 1.8 + act * (1.2 + Math.sin(T * 6) * 0.5); }
+  if (F.antennaTip) F.antennaTip.material.emissiveIntensity = 2 + Math.sin(T * (2 + act * 6)) * 1.5;
+
+  // desk glow: working = the agent's own colour; learning / leads / blocked = the state colour
+  const st = STATES[a.state] || STATES.idle;
+  _gc.set(a.state === 'working' || a.state === 'idle' ? a.color : st.col);
+  a.glow.lerp(_gc, k4);
+  _tc.copy(a.tint).lerp(_red, wK * 0.8);
+  const scrB = 0.2 + b * 1.35 + wL * 0.45 + wD * 0.8 + wK * (0.35 + Math.sin(T * 3) * 0.25);
+  for (const m of a.screens) {
+    m.color.copy(_tc).multiplyScalar(scrB);
+    m.map.offset.y -= dt * (0.22 * b + 0.05 * wD);
+  }
+  a.keysMat.color.copy(a.tint).multiplyScalar(0.04 + b * 0.5);
+  a.spillMat.opacity = 0.04 + Math.min(1, act) * 0.32;
+  a.flash = Math.max(0, a.flash - dt * 1.5);
+  a.ringMat.color.copy(a.glow).multiplyScalar(1.4);
+  a.poolMat.color.copy(a.glow);
+  a.ringMat.opacity = 0.08 + act * (0.55 + Math.sin(T * 3) * 0.1) + a.hover * 0.4 + a.flash * 0.6;
+  a.poolMat.opacity = act * 0.22 + a.hover * 0.15 + a.flash * 0.3;
+}
+
+/* ===================== INTERACTION ===================== */
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+let lastPointer = null, downAt = null, pendingPick = false;
+renderer.domElement.addEventListener('pointermove', e => {
+  lastPointer = e; pendingPick = true;
+  tip.style.left = Math.min(innerWidth - 270, e.clientX + 16) + 'px';
+  tip.style.top = Math.min(innerHeight - 110, e.clientY + 14) + 'px';
+});
+renderer.domElement.addEventListener('pointerleave', () => { lastPointer = null; setHover(null); });
+renderer.domElement.addEventListener('pointerdown', e => { downAt = { x:e.clientX, y:e.clientY }; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 5 && hovered) focusAgent(hovered);
+  downAt = null;
+});
+function doPick() {
+  if (!pendingPick || !lastPointer) return; pendingPick = false;
+  if (lastPointer.buttons) return;
+  ndc.set(lastPointer.clientX / innerWidth * 2 - 1, -(lastPointer.clientY / innerHeight) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  const hit = raycaster.intersectObjects(pickables, false)[0];
+  setHover(hit ? hit.object.userData.agent : null);
+}
+
+let tween = null;
+function flyTo(pos, target, dur = 1.2) {
+  tween = { p0:camera.position.clone(), t0:controls.target.clone(), p1:pos.clone(), t1:target.clone(), k:0, dur };
+}
+controls.addEventListener('start', () => { tween = null; });
+function focusAgent(a) {
+  const target = a.ws.localToWorld(new THREE.Vector3(0, 1.05, a.seatZ));
+  const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(a.ws.getWorldQuaternion(new THREE.Quaternion()));
+  const side = new THREE.Vector3(fwd.z, 0, -fwd.x);
+  const pos = target.clone().addScaledVector(fwd, 2.4).addScaledVector(side, 0.9).add(new THREE.Vector3(0, 1.9, 0));
+  flyTo(pos, target);
+  if (live.mode === 'demo') feed(`Camera → <b style="color:${a.color}">${a.name}</b> · ${a.busy ? esc(a.activity.toLowerCase()) : 'idle'}`, '#8b93a8');
+}
+function updateTween(dt) {
+  if (!tween) return;
+  tween.k = Math.min(1, tween.k + dt / tween.dur);
+  const k = tween.k, e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+  camera.position.lerpVectors(tween.p0, tween.p1, e);
+  controls.target.lerpVectors(tween.t0, tween.t1, e);
+  if (k >= 1) tween = null;
+}
+
+$('btnSim').onclick = () => (live.mode === 'demo' ? stopDemo() : startSim());
+$('btnReset').onclick = () => (live.mode === 'demo' ? stopDemo() : poll());
+$('btnView').onclick = () => flyTo(HOME.pos, HOME.target, 1.4);
+$('btnOrbit').onclick = () => { controls.autoRotate = !controls.autoRotate; $('btnOrbit').classList.toggle('toggled', controls.autoRotate); };
+const LBL = ['full', 'name', 'off']; let lblIdx = 0;
+$('btnLabels').onclick = () => {
+  lblIdx = (lblIdx + 1) % 3;
+  document.body.classList.remove('lbl-name', 'lbl-off');
+  if (LBL[lblIdx] !== 'full') document.body.classList.add('lbl-' + LBL[lblIdx]);
+  $('btnLabels').textContent = 'Labels: ' + LBL[lblIdx];
+};
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); labelRenderer.setSize(innerWidth, innerHeight);
+  if (composer) composer.setSize(innerWidth, innerHeight);
+});
+
+/* ===================== LOOP ===================== */
+const clock = new THREE.Clock();
+const _v = new THREE.Vector3();
+let boardTimer = 0, firstFrame = true;
+function tick() {
+  const rawDt = clock.getDelta(), dt = Math.min(rawDt, 0.05), t = clock.elapsedTime;
+  updateSim(dt);
+  updateOrbs(dt);
+  for (const a of AGENTS) animateAgent(a, dt, t);
+  const nBusy = AGENTS.filter(a => a.busy).length;
+  holo.userData.spin.rotation.y += dt * 0.5;
+  holo.userData.reel.rotation.z += dt * (0.6 + nBusy * 0.12);
+  holo.userData.spin.position.y = 1.5 + Math.sin(t * 1.2) * 0.04;
+
+  updateTween(Math.min(rawDt, 0.25));
+  controls.update();
+  controls.target.x = clamp(controls.target.x, -RW / 2 + 0.5, RW / 2 - 0.5);
+  controls.target.z = clamp(controls.target.z, -RD / 2 + 0.5, RD / 2 - 0.5);
+  controls.target.y = clamp(controls.target.y, 0, RH - 0.5);
+
+  // dollhouse cut-away: hide any wall standing between the camera and the room
+  for (const w of walls) { _v.copy(camera.position).sub(w.point); w.group.visible = _v.dot(w.normal) > 0.2; }
+  ceiling.visible = camera.position.y < RH - 0.15 && Math.abs(camera.position.x) < RW / 2 && Math.abs(camera.position.z) < RD / 2;
+
+  doPick();
+  boardTimer -= dt;
+  if (boardDirty && boardTimer <= 0) { drawBoard(); boardDirty = false; boardTimer = 0.3; }
+
+  if (composer) composer.render(); else renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  if (firstFrame) { firstFrame = false; $('loading').classList.add('done'); setTimeout(() => $('loading').remove(), 700); }
+}
+AGENTS.forEach(refreshAgent);
+drawBoard();
+setLiveUI();
+feed('Connecting to live status…', '#8b93a8');
+$('clock').textContent = timeStr(); setInterval(() => { $('clock').textContent = timeStr(); }, 1000);
+renderer.setAnimationLoop(tick);
+poll(); setInterval(poll, POLL_MS);                 // LIVE by default
+if (params.has('busy')) startSim();                // optional demo via ?busy
+if (params.has('focus') && byId[params.get('focus')]) { const fa = byId[params.get('focus')]; setTimeout(() => focusAgent(fa), 300); }
+window.__office3d = { scene, camera, controls, AGENTS, live, poll, startSim, stopDemo, focusAgent };
+</script>
+
+<script>
+  // Fallback message if the CDN / module graph fails (offline, blocked CDN, very old browser)
+  function __office3dFail(msg) {
+    var e = document.getElementById('err'); if (!e) return;
+    document.getElementById('errMsg').innerHTML = msg; e.style.display = 'grid';
+    var l = document.getElementById('loading'); if (l) l.style.display = 'none';
+  }
+  window.addEventListener('error', function (ev) {
+    if (window.__office3dLoaded) return;
+    __office3dFail('<b>3D office failed to start.</b><br>' + (ev.message || 'Script error') +
+      '<br><br>It needs internet access to <code>cdn.jsdelivr.net</code> (Three.js r160).');
+  });
+  setTimeout(function () {
+    if (!window.__office3dLoaded) __office3dFail('<b>Couldn’t load Three.js from the CDN.</b><br><br>' +
+      'Check your internet connection (Three.js r160 loads from <code>cdn.jsdelivr.net</code>). ' +
+      'If your browser blocks modules on <code>file://</code>, serve the folder instead:<br><br>' +
+      '<code>python3 -m http.server 8000</code> (run inside the studio folder)<br>then open <code>http://localhost:8000/virtual-office-3d.html</code>');
+  }, 12000);
+</script>
+</body>
+</html>

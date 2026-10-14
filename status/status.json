@@ -1,0 +1,114 @@
+{
+ "grok": {
+  "name": "Grok",
+  "project": "",
+  "state": "idle",
+  "task": "Learning session 2026-10-14 done (Judge EXP-011 review REVISE + EXP-012, pending Cut/Manager review)",
+  "updated": "2026-10-14T15:56:47+08:00"
+ },
+ "reed": {
+  "name": "Reed",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-06T15:53:23+08:00"
+ },
+ "iris": {
+  "name": "Iris",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-06T15:54:04+08:00"
+ },
+ "ivy": {
+  "name": "Ivy",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-06T15:55:12+08:00"
+ },
+ "nova": {
+  "name": "Nova",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-06T15:56:02+08:00"
+ },
+ "atlas": {
+  "name": "Atlas",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-07T15:48:48+08:00"
+ },
+ "vera": {
+  "name": "Vera",
+  "project": "[OOT]",
+  "state": "idle",
+  "task": "[OOT][PAUSED]; EXP-008 evidence on disk, not revalidated. No active OOT visual work.",
+  "updated": "2026-10-14T08:06:41+08:00"
+ },
+ "lens": {
+  "name": "Lens",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-08T15:55:16+08:00"
+ },
+ "pix": {
+  "name": "Pix",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-09T15:47:14+08:00"
+ },
+ "frame": {
+  "name": "Frame",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-06T11:46:34+08:00"
+ },
+ "reel": {
+  "name": "Reel",
+  "project": "",
+  "state": "idle",
+  "task": "OSL Producer idle; Shot 04 is OOT-paused (not an OSL blocker). No OSL brief/assets yet.",
+  "updated": "2026-10-14T08:06:41+08:00"
+ },
+ "vox": {
+  "name": "Vox",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-12T15:54:52+08:00"
+ },
+ "cut": {
+  "name": "Cut",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-13T15:46:43+08:00"
+ },
+ "judge": {
+  "name": "Judge",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-14T15:56:46+08:00"
+ },
+ "press": {
+  "name": "Press",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-06T11:46:34+08:00"
+ },
+ "pulse": {
+  "name": "Pulse",
+  "project": "",
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-06T11:46:34+08:00"
+ }
+}

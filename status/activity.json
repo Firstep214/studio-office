@@ -1,0 +1,52 @@
+{
+ "entries": [
+  {
+   "ts": "2026-10-13T15:43:59+08:00",
+   "agent": "grok",
+   "state": "working",
+   "task": "Studio learning session 2026-10-13: Cut (focus agent)"
+  },
+  {
+   "ts": "2026-10-13T15:43:59+08:00",
+   "agent": "cut",
+   "state": "learning",
+   "task": "Idle session: edit/caption safe-zone + EXP-010 mute_bridge recount (20 min max)"
+  },
+  {
+   "ts": "2026-10-13T15:46:43+08:00",
+   "agent": "cut",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-13T15:46:43+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-13 done (Cut EXP-010 recount + EXP-011, pending Judge/Manager review)"
+  },
+  {
+   "ts": "2026-10-14T15:52:38+08:00",
+   "agent": "grok",
+   "state": "working",
+   "task": "Studio learning session 2026-10-14: Judge (focus agent)"
+  },
+  {
+   "ts": "2026-10-14T15:52:38+08:00",
+   "agent": "judge",
+   "state": "learning",
+   "task": "Idle session: EXP-011 independent recount + measured final-QC technique (20 min max)"
+  },
+  {
+   "ts": "2026-10-14T15:56:46+08:00",
+   "agent": "judge",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-14T15:56:47+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-14 done (Judge EXP-011 review REVISE + EXP-012, pending Cut/Manager review)"
+  }
+ ]
+}
