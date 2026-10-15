@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-15T08:16:02+00:00",
+ "generated": "2026-10-15T08:27:40+00:00",
  "agents": {
   "arbiter": {
    "state": "done",
@@ -22,33 +22,33 @@
    "updated": "2026-10-14T09:48:06+00:00"
   },
   "sentinel": {
-   "state": "done",
-   "task": "Forge batch 1 finished: 24 games",
+   "state": "working",
+   "task": "Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "oracle": {
-   "state": "done",
-   "task": "Forge batch 1 finished: 24 games",
+   "state": "working",
+   "task": "Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "kael": {
-   "state": "done",
-   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 finished: 24 games",
+   "state": "working",
+   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "nyx": {
-   "state": "done",
-   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 finished: 24 games",
+   "state": "working",
+   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "vex": {
-   "state": "done",
-   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 finished: 24 games",
+   "state": "working",
+   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "thorne": {
-   "state": "done",
-   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 finished: 24 games",
+   "state": "working",
+   "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 running: 24/24 games finished",
    "updated": "2026-10-14T11:18:35+00:00"
   },
   "magnus": {
@@ -78,7 +78,7 @@
   }
  },
  "playtest": {
-  "running": false,
+  "running": true,
   "games_logged": 24,
   "games_finished": 24,
   "last_game": {
