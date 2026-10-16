@@ -1,42 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-10-14T15:52:38+08:00",
-   "agent": "grok",
-   "state": "working",
-   "task": "Studio learning session 2026-10-14: Judge (focus agent)"
-  },
-  {
-   "ts": "2026-10-14T15:52:38+08:00",
-   "agent": "judge",
-   "state": "learning",
-   "task": "Idle session: EXP-011 independent recount + measured final-QC technique (20 min max)"
-  },
-  {
-   "ts": "2026-10-14T15:56:46+08:00",
-   "agent": "judge",
-   "state": "idle",
-   "task": "No active task"
-  },
-  {
-   "ts": "2026-10-14T15:56:47+08:00",
-   "agent": "grok",
-   "state": "idle",
-   "task": "Learning session 2026-10-14 done (Judge EXP-011 review REVISE + EXP-012, pending Cut/Manager review)"
-  },
-  {
-   "ts": "2026-10-15T15:44:41+08:00",
-   "agent": "grok",
-   "state": "working",
-   "task": "Studio learning session 2026-10-15: Press (focus agent)"
-  },
-  {
-   "ts": "2026-10-15T15:44:41+08:00",
-   "agent": "press",
-   "state": "learning",
-   "task": "Idle session: Shorts publish-readiness / disclosure / metadata checklist (20 min max)"
-  },
-  {
    "ts": "2026-10-15T15:46:25+08:00",
    "agent": "press",
    "state": "idle",
@@ -47,6 +11,42 @@
    "agent": "grok",
    "state": "idle",
    "task": "Learning session 2026-10-15 done (Press EXP-013 publish preflight, pending Judge/Manager review)"
+  },
+  {
+   "ts": "2026-10-16T15:44:55+08:00",
+   "agent": "grok",
+   "state": "working",
+   "task": "Studio learning session 2026-10-16: Pulse (focus agent)"
+  },
+  {
+   "ts": "2026-10-16T15:44:55+08:00",
+   "agent": "pulse",
+   "state": "learning",
+   "task": "Idle session: Shorts analytics readiness / measurement plan (20 min max)"
+  },
+  {
+   "ts": "2026-10-16T15:45:18+08:00",
+   "agent": "pulse",
+   "state": "learning",
+   "task": "EXP-014 metric snapshot learning session (offline, [amount])"
+  },
+  {
+   "ts": "2026-10-16T15:48:11+08:00",
+   "agent": "pulse",
+   "state": "idle",
+   "task": "EXP-014 metric snapshot PROPOSED (self-review pending; live BLOCKED)"
+  },
+  {
+   "ts": "2026-10-16T15:48:42+08:00",
+   "agent": "pulse",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-16T15:48:42+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-16 done (Pulse EXP-014 metric snapshot, pending Judge/Manager review)"
   }
  ]
 }
