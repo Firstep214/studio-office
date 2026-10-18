@@ -1,80 +1,80 @@
 {
- "generated": "2026-10-17T12:13:27+00:00",
+ "generated": "2026-10-18T03:45:10+00:00",
  "agents": {
   "arbiter": {
    "state": "done",
    "task": "CH001 re-audit A:PASS B:PASS C:PASS D:PASS",
-   "updated": "2026-10-14T11:00:13+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "nemesis": {
    "state": "done",
    "task": "CH001 re-audit A:REVISE B:PASS C:PASS D:PASS",
-   "updated": "2026-10-14T11:01:06+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "codex": {
    "state": "done",
    "task": "Official CR / ban list / Game Changers cached; deck prices from one snapshot",
-   "updated": "2026-10-14T10:58:12+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "forge": {
    "state": "done",
    "task": "Built 4 V1 decks (Bracket 2) + Forge .dck files",
-   "updated": "2026-10-14T09:48:06+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "sentinel": {
    "state": "done",
    "task": "Forge batch 1 finished: 24 games",
-   "updated": "2026-10-14T11:18:35+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "oracle": {
    "state": "done",
    "task": "Forge batch 1 finished: 24 games",
-   "updated": "2026-10-14T11:18:35+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "kael": {
    "state": "done",
    "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 finished: 24 games",
-   "updated": "2026-10-14T11:18:35+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "nyx": {
    "state": "done",
    "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 finished: 24 games",
-   "updated": "2026-10-14T11:18:35+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "vex": {
    "state": "done",
    "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 finished: 24 games",
-   "updated": "2026-10-14T11:18:35+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "thorne": {
    "state": "done",
    "task": "Seat at table (Forge AI pilots decks) · Forge batch 1 finished: 24 games",
-   "updated": "2026-10-14T11:18:35+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "magnus": {
    "state": "idle",
    "task": "No active CH001 task in STATUS_CH001.md",
-   "updated": "2026-10-15T06:55:46+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "sage": {
    "state": "idle",
    "task": "No active CH001 task in STATUS_CH001.md",
-   "updated": "2026-10-15T06:55:46+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "cipher": {
    "state": "idle",
    "task": "No active CH001 task in STATUS_CH001.md",
-   "updated": "2026-10-15T06:55:46+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "vector": {
    "state": "idle",
    "task": "No active CH001 task in STATUS_CH001.md",
-   "updated": "2026-10-15T06:55:46+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   },
   "aegis": {
    "state": "idle",
    "task": "No active CH001 task in STATUS_CH001.md",
-   "updated": "2026-10-15T06:55:46+00:00"
+   "updated": "2026-10-18T03:40:51+00:00"
   }
  },
  "playtest": {
@@ -84,12 +84,12 @@
   "last_game": {
    "winner": "C",
    "draw": false,
-   "seconds": 192,
-   "at": "2026-10-14T11:20:47+00:00"
+   "seconds": 83,
+   "at": "2026-10-18T03:40:51+00:00"
   },
   "report": {
    "file": "PLAYTEST_BATCH1.md",
-   "updated": "2026-10-14T20:45:20+00:00",
+   "updated": "2026-10-18T03:40:51+00:00",
    "lines": [
     "## Results (24/24 games finished; 0 draws; 0 timeouts; 0 crashes)",
     "| Deck | Wins | Win % |",
@@ -100,7 +100,7 @@
     "Turns = Forge outcome turn, about ceil(global per-player turn count / 2), NOT rounds (logs not re-parsed for B1). Mean 26.0, min 19, max 43, which is about 13 f"
    ]
   },
-  "updated": "2026-10-14T11:20:47+00:00"
+  "updated": "2026-10-18T03:40:51+00:00"
  },
  "decks": {
   "A": {
@@ -120,5 +120,5 @@
    "nemesis": "PASS"
   }
  },
- "status_file_updated": "2026-10-15T06:55:46+00:00"
+ "status_file_updated": "2026-10-18T03:40:51+00:00"
 }
