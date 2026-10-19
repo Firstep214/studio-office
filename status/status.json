@@ -2,16 +2,16 @@
  "grok": {
   "name": "Grok",
   "project": "",
-  "state": "idle",
-  "task": "Learning session 2026-10-16 done (Pulse EXP-014 metric snapshot, pending Judge/Manager review)",
-  "updated": "2026-10-16T15:48:42+08:00"
+  "state": "working",
+  "task": "Studio learning session 2026-10-19: Reed (focus agent)",
+  "updated": "2026-10-19T15:49:53+08:00"
  },
  "reed": {
   "name": "Reed",
   "project": "",
-  "state": "idle",
-  "task": "No active task",
-  "updated": "2026-10-06T15:53:23+08:00"
+  "state": "learning",
+  "task": "Idle session: OSL short-form research / lead verification (20 min max, offline-first, [amount])",
+  "updated": "2026-10-19T15:49:53+08:00"
  },
  "iris": {
   "name": "Iris",
