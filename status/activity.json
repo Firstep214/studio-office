@@ -1,18 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-10-16T15:44:55+08:00",
-   "agent": "grok",
-   "state": "working",
-   "task": "Studio learning session 2026-10-16: Pulse (focus agent)"
-  },
-  {
-   "ts": "2026-10-16T15:44:55+08:00",
-   "agent": "pulse",
-   "state": "learning",
-   "task": "Idle session: Shorts analytics readiness / measurement plan (20 min max)"
-  },
-  {
    "ts": "2026-10-16T15:45:18+08:00",
    "agent": "pulse",
    "state": "learning",
@@ -47,6 +35,18 @@
    "agent": "reed",
    "state": "learning",
    "task": "Idle session: OSL short-form research / lead verification (20 min max, offline-first, [amount])"
+  },
+  {
+   "ts": "2026-10-19T15:51:30+08:00",
+   "agent": "reed",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-19T15:51:30+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-19 done (Reed EXP-015 claim ledger, pending Judge/Manager review)"
   }
  ]
 }
