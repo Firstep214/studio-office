@@ -2,9 +2,9 @@
  "grok": {
   "name": "Grok",
   "project": "",
-  "state": "working",
-  "task": "Studio learning session 2026-10-20: Ivy (focus agent)",
-  "updated": "2026-10-20T15:50:09+08:00"
+  "state": "idle",
+  "task": "Learning session 2026-10-20 done (Ivy EXP-016 hook/end grid, pending Reviewer/Manager review)",
+  "updated": "2026-10-20T15:55:15+08:00"
  },
  "reed": {
   "name": "Reed",
@@ -23,9 +23,9 @@
  "ivy": {
   "name": "Ivy",
   "project": "",
-  "state": "learning",
-  "task": "EXP-016 idle focus: script hook technique",
-  "updated": "2026-10-20T15:50:41+08:00"
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-20T15:55:15+08:00"
  },
  "nova": {
   "name": "Nova",

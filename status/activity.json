@@ -1,24 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-10-16T15:48:42+08:00",
-   "agent": "grok",
-   "state": "idle",
-   "task": "Learning session 2026-10-16 done (Pulse EXP-014 metric snapshot, pending Judge/Manager review)"
-  },
-  {
-   "ts": "2026-10-19T15:49:53+08:00",
-   "agent": "grok",
-   "state": "working",
-   "task": "Studio learning session 2026-10-19: Reed (focus agent)"
-  },
-  {
-   "ts": "2026-10-19T15:49:53+08:00",
-   "agent": "reed",
-   "state": "learning",
-   "task": "Idle session: OSL short-form research / lead verification (20 min max, offline-first, [amount])"
-  },
-  {
    "ts": "2026-10-19T15:51:30+08:00",
    "agent": "reed",
    "state": "idle",
@@ -47,6 +29,24 @@
    "agent": "ivy",
    "state": "learning",
    "task": "EXP-016 idle focus: script hook technique"
+  },
+  {
+   "ts": "2026-10-20T15:54:47+08:00",
+   "agent": "ivy",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-20T15:55:15+08:00",
+   "agent": "ivy",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-20T15:55:15+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-20 done (Ivy EXP-016 hook/end grid, pending Reviewer/Manager review)"
   }
  ]
 }
