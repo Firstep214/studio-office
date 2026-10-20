@@ -2,9 +2,9 @@
  "grok": {
   "name": "Grok",
   "project": "",
-  "state": "idle",
-  "task": "Learning session 2026-10-19 done (Reed EXP-015 claim ledger, pending Judge/Manager review)",
-  "updated": "2026-10-19T15:51:30+08:00"
+  "state": "working",
+  "task": "Studio learning session 2026-10-20: Ivy (focus agent)",
+  "updated": "2026-10-20T15:50:09+08:00"
  },
  "reed": {
   "name": "Reed",
@@ -23,9 +23,9 @@
  "ivy": {
   "name": "Ivy",
   "project": "",
-  "state": "idle",
-  "task": "No active task",
-  "updated": "2026-10-06T15:55:12+08:00"
+  "state": "learning",
+  "task": "EXP-016 idle focus: script hook technique",
+  "updated": "2026-10-20T15:50:41+08:00"
  },
  "nova": {
   "name": "Nova",
