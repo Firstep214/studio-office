@@ -2,9 +2,9 @@
  "grok": {
   "name": "Grok",
   "project": "",
-  "state": "working",
-  "task": "Learning session 2026-10-21: focus Reel ([OSL] Producer)",
-  "updated": "2026-10-21T15:49:51+08:00"
+  "state": "idle",
+  "task": "Learning session 2026-10-21 done (Reel EXP-017 asset manifest, pending Reviewer/Manager recount)",
+  "updated": "2026-10-21T15:54:26+08:00"
  },
  "reed": {
   "name": "Reed",
@@ -72,9 +72,9 @@
  "reel": {
   "name": "Reel",
   "project": "",
-  "state": "learning",
-  "task": "EXP-017 producer asset manifest (offline)",
-  "updated": "2026-10-21T15:51:11+08:00"
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-21T15:54:26+08:00"
  },
  "vox": {
   "name": "Vox",
