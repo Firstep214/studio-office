@@ -2,9 +2,9 @@
  "grok": {
   "name": "Grok",
   "project": "",
-  "state": "idle",
-  "task": "Learning session 2026-10-20 done (Ivy EXP-016 hook/end grid, pending Reviewer/Manager review)",
-  "updated": "2026-10-20T15:55:15+08:00"
+  "state": "working",
+  "task": "Learning session 2026-10-21: focus Reel ([OSL] Producer)",
+  "updated": "2026-10-21T15:49:51+08:00"
  },
  "reed": {
   "name": "Reed",
@@ -72,9 +72,9 @@
  "reel": {
   "name": "Reel",
   "project": "",
-  "state": "idle",
-  "task": "OSL Producer idle; Shot 04 is OOT-paused (not an OSL blocker). No OSL brief/assets yet.",
-  "updated": "2026-10-14T08:06:41+08:00"
+  "state": "learning",
+  "task": "EXP-017 producer asset manifest (offline)",
+  "updated": "2026-10-21T15:51:11+08:00"
  },
  "vox": {
   "name": "Vox",

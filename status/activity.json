@@ -1,24 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-10-19T15:51:30+08:00",
-   "agent": "reed",
-   "state": "idle",
-   "task": "No active task"
-  },
-  {
-   "ts": "2026-10-19T15:51:30+08:00",
-   "agent": "grok",
-   "state": "idle",
-   "task": "Learning session 2026-10-19 done (Reed EXP-015 claim ledger, pending Judge/Manager review)"
-  },
-  {
-   "ts": "2026-10-20T15:50:09+08:00",
-   "agent": "grok",
-   "state": "working",
-   "task": "Studio learning session 2026-10-20: Ivy (focus agent)"
-  },
-  {
    "ts": "2026-10-20T15:50:09+08:00",
    "agent": "ivy",
    "state": "learning",
@@ -47,6 +29,24 @@
    "agent": "grok",
    "state": "idle",
    "task": "Learning session 2026-10-20 done (Ivy EXP-016 hook/end grid, pending Reviewer/Manager review)"
+  },
+  {
+   "ts": "2026-10-21T15:49:51+08:00",
+   "agent": "grok",
+   "state": "working",
+   "task": "Learning session 2026-10-21: focus Reel ([OSL] Producer)"
+  },
+  {
+   "ts": "2026-10-21T15:49:51+08:00",
+   "agent": "reel",
+   "state": "learning",
+   "task": "Idle focus session 2026-10-21 (max 20 min)"
+  },
+  {
+   "ts": "2026-10-21T15:51:11+08:00",
+   "agent": "reel",
+   "state": "learning",
+   "task": "EXP-017 producer asset manifest (offline)"
   }
  ]
 }
