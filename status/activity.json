@@ -1,42 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-10-20T15:55:15+08:00",
-   "agent": "ivy",
-   "state": "idle",
-   "task": "No active task"
-  },
-  {
-   "ts": "2026-10-20T15:55:15+08:00",
-   "agent": "grok",
-   "state": "idle",
-   "task": "Learning session 2026-10-20 done (Ivy EXP-016 hook/end grid, pending Reviewer/Manager review)"
-  },
-  {
-   "ts": "2026-10-21T15:49:51+08:00",
-   "agent": "grok",
-   "state": "working",
-   "task": "Learning session 2026-10-21: focus Reel ([OSL] Producer)"
-  },
-  {
-   "ts": "2026-10-21T15:49:51+08:00",
-   "agent": "reel",
-   "state": "learning",
-   "task": "Idle focus session 2026-10-21 (max 20 min)"
-  },
-  {
-   "ts": "2026-10-21T15:51:11+08:00",
-   "agent": "reel",
-   "state": "learning",
-   "task": "EXP-017 producer asset manifest (offline)"
-  },
-  {
-   "ts": "2026-10-21T15:54:01+08:00",
-   "agent": "reel",
-   "state": "idle",
-   "task": "EXP-017 proposed (self-review, pending Reviewer recount)"
-  },
-  {
    "ts": "2026-10-21T15:54:26+08:00",
    "agent": "reel",
    "state": "idle",
@@ -47,6 +11,42 @@
    "agent": "grok",
    "state": "idle",
    "task": "Learning session 2026-10-21 done (Reel EXP-017 asset manifest, pending Reviewer/Manager recount)"
+  },
+  {
+   "ts": "2026-10-22T15:44:20+08:00",
+   "agent": "grok",
+   "state": "working",
+   "task": "Learning session 2026-10-22: focus Vox ([STUDIO] Voice & Audio)"
+  },
+  {
+   "ts": "2026-10-22T15:44:20+08:00",
+   "agent": "vox",
+   "state": "learning",
+   "task": "Idle focus session 2026-10-22 (max 20 min, offline, [amount])"
+  },
+  {
+   "ts": "2026-10-22T15:44:42+08:00",
+   "agent": "vox",
+   "state": "learning",
+   "task": "EXP-018 audio handoff checker (offline)"
+  },
+  {
+   "ts": "2026-10-22T15:47:34+08:00",
+   "agent": "vox",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-22T15:48:00+08:00",
+   "agent": "vox",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-22T15:48:00+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-22 done (Vox EXP-018 audio handoff checker, pending Cut/Judge recount)"
   }
  ]
 }
