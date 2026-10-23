@@ -2,9 +2,9 @@
  "grok": {
   "name": "Grok",
   "project": "",
-  "state": "learning",
-  "task": "Learning session 2026-10-23: focus agent Cut (max 20 min, offline, [amount])",
-  "updated": "2026-10-23T15:52:56+08:00"
+  "state": "idle",
+  "task": "Learning session 2026-10-23 done (Cut EXP-018 recount: REVISE, true-peak rounding bug + 3 gaps; not ready to adopt)",
+  "updated": "2026-10-23T15:56:55+08:00"
  },
  "reed": {
   "name": "Reed",
@@ -86,9 +86,9 @@
  "cut": {
   "name": "Cut",
   "project": "",
-  "state": "learning",
-  "task": "EXP-018 recount (offline)",
-  "updated": "2026-10-23T15:53:16+08:00"
+  "state": "idle",
+  "task": "No active task",
+  "updated": "2026-10-23T15:56:55+08:00"
  },
  "judge": {
   "name": "Judge",
