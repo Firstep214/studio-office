@@ -1,36 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-10-22T15:48:00+08:00",
-   "agent": "vox",
-   "state": "idle",
-   "task": "No active task"
-  },
-  {
-   "ts": "2026-10-22T15:48:00+08:00",
-   "agent": "grok",
-   "state": "idle",
-   "task": "Learning session 2026-10-22 done (Vox EXP-018 audio handoff checker, pending Cut/Judge recount)"
-  },
-  {
-   "ts": "2026-10-23T15:52:56+08:00",
-   "agent": "grok",
-   "state": "learning",
-   "task": "Learning session 2026-10-23: focus agent Cut (max 20 min, offline, [amount])"
-  },
-  {
-   "ts": "2026-10-23T15:52:56+08:00",
-   "agent": "cut",
-   "state": "learning",
-   "task": "Idle focus session 2026-10-23 (max 20 min, offline, [amount])"
-  },
-  {
-   "ts": "2026-10-23T15:53:16+08:00",
-   "agent": "cut",
-   "state": "learning",
-   "task": "EXP-018 recount (offline)"
-  },
-  {
    "ts": "2026-10-23T15:56:34+08:00",
    "agent": "cut",
    "state": "idle",
@@ -47,6 +17,36 @@
    "agent": "grok",
    "state": "idle",
    "task": "Learning session 2026-10-23 done (Cut EXP-018 recount: REVISE, true-peak rounding bug + 3 gaps; not ready to adopt)"
+  },
+  {
+   "ts": "2026-10-26T15:51:11+08:00",
+   "agent": "grok",
+   "state": "working",
+   "task": "Learning session 2026-10-26: focus Judge ([OSL] Reviewer) — EXP-017 recount"
+  },
+  {
+   "ts": "2026-10-26T15:51:11+08:00",
+   "agent": "judge",
+   "state": "learning",
+   "task": "Idle focus: independent recount of Reel EXP-017 producer asset manifest checker (offline)"
+  },
+  {
+   "ts": "2026-10-26T15:52:15+08:00",
+   "agent": "judge",
+   "state": "learning",
+   "task": "Idle learning: EXP-017 reviewer recount"
+  },
+  {
+   "ts": "2026-10-26T15:54:55+08:00",
+   "agent": "judge",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-26T15:54:56+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-26 done (Judge EXP-017 recount: REVISE)"
   }
  ]
 }
