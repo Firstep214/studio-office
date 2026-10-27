@@ -1,30 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-10-23T15:56:34+08:00",
-   "agent": "cut",
-   "state": "idle",
-   "task": "No active task"
-  },
-  {
-   "ts": "2026-10-23T15:56:55+08:00",
-   "agent": "cut",
-   "state": "idle",
-   "task": "No active task"
-  },
-  {
-   "ts": "2026-10-23T15:56:55+08:00",
-   "agent": "grok",
-   "state": "idle",
-   "task": "Learning session 2026-10-23 done (Cut EXP-018 recount: REVISE, true-peak rounding bug + 3 gaps; not ready to adopt)"
-  },
-  {
-   "ts": "2026-10-26T15:51:11+08:00",
-   "agent": "grok",
-   "state": "working",
-   "task": "Learning session 2026-10-26: focus Judge ([OSL] Reviewer) — EXP-017 recount"
-  },
-  {
    "ts": "2026-10-26T15:51:11+08:00",
    "agent": "judge",
    "state": "learning",
@@ -47,6 +23,30 @@
    "agent": "grok",
    "state": "idle",
    "task": "Learning session 2026-10-26 done (Judge EXP-017 recount: REVISE)"
+  },
+  {
+   "ts": "2026-10-27T15:46:28+08:00",
+   "agent": "grok",
+   "state": "working",
+   "task": "Learning session 2026-10-27: focus Press ([STUDIO] Publishing) — EXP-013 self-probe"
+  },
+  {
+   "ts": "2026-10-27T15:46:28+08:00",
+   "agent": "press",
+   "state": "learning",
+   "task": "Idle focus: adversarial probe of own EXP-013 publish preflight checker (offline)"
+  },
+  {
+   "ts": "2026-10-27T15:48:18+08:00",
+   "agent": "press",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-27T15:48:18+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-27 done (Press EXP-013 self-probe: REVISE)"
   }
  ]
 }
