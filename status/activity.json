@@ -1,30 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-10-28T15:52:28+08:00",
-   "agent": "grok",
-   "state": "working",
-   "task": "Learning session 2026-10-28: focus Pulse ([STUDIO] Analytics) — EXP-014 self-probe"
-  },
-  {
-   "ts": "2026-10-28T15:52:28+08:00",
-   "agent": "pulse",
-   "state": "learning",
-   "task": "Idle focus: adversarial self-probe of own EXP-014 metric snapshot checker (offline)"
-  },
-  {
-   "ts": "2026-10-28T15:53:44+08:00",
-   "agent": "pulse",
-   "state": "idle",
-   "task": "No active task"
-  },
-  {
-   "ts": "2026-10-28T15:53:44+08:00",
-   "agent": "grok",
-   "state": "idle",
-   "task": "Learning session 2026-10-28 done (Pulse EXP-014 self-probe: REVISE)"
-  },
-  {
    "ts": "2026-10-29T15:46:15+08:00",
    "agent": "grok",
    "state": "working",
@@ -47,6 +23,30 @@
    "agent": "grok",
    "state": "idle",
    "task": "Learning session 2026-10-29 done (Reed EXP-015 self-probe: REVISE)"
+  },
+  {
+   "ts": "2026-10-30T15:48:24+08:00",
+   "agent": "grok",
+   "state": "working",
+   "task": "Learning session 2026-10-30: focus Ivy (EXP-016 self-probe)"
+  },
+  {
+   "ts": "2026-10-30T15:48:24+08:00",
+   "agent": "ivy",
+   "state": "learning",
+   "task": "Idle focus: self-probe EXP-016 hook/end grid (offline, 20 min cap)"
+  },
+  {
+   "ts": "2026-10-30T15:49:21+08:00",
+   "agent": "ivy",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-10-30T15:49:21+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-10-30 done (Ivy EXP-016 self-probe: REVISE)"
   }
  ]
 }
