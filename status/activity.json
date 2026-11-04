@@ -1,18 +1,6 @@
 {
  "entries": [
   {
-   "ts": "2026-11-02T15:46:09+08:00",
-   "agent": "reel",
-   "state": "idle",
-   "task": "No active task"
-  },
-  {
-   "ts": "2026-11-02T15:46:09+08:00",
-   "agent": "grok",
-   "state": "idle",
-   "task": "Learning session 2026-11-02 done (Reel EXP-017 checker v0.1: self-run pass, needs blind re-run)"
-  },
-  {
    "ts": "2026-11-03T15:48:44+08:00",
    "agent": "grok",
    "state": "working",
@@ -47,6 +35,18 @@
    "agent": "cut",
    "state": "learning",
    "task": "EXP-017 v0.1 blind re-run + own plants (offline, [amount])"
+  },
+  {
+   "ts": "2026-11-04T15:49:43+08:00",
+   "agent": "cut",
+   "state": "idle",
+   "task": "No active task"
+  },
+  {
+   "ts": "2026-11-04T15:49:43+08:00",
+   "agent": "grok",
+   "state": "idle",
+   "task": "Learning session 2026-11-04 done (Cut re-ran EXP-017 v0.1: 12/16 own plants, REVISE small)"
   }
  ]
 }
